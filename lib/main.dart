@@ -1,32 +1,29 @@
-import 'package:sqflite_common/sqlite_api.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:flutibre_pro/utils/settings_provider.dart';
+import 'package:flutibre_pro/db_helper/database_helper.dart';
+import 'package:flutter/material.dart';
 
-main() {
-  var flutibreMain = FlutibreDatabase();
+import 'package:provider/provider.dart';
+
+void main() {
+  Provider.debugCheckInvalidValueType = null;
+
+  var flutibreMain = DatabaseHelper();
   flutibreMain.databasefactory();
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => SettingsProvider()),
+      ],
+      child: const Flutibre(),
+    ),
+  );
 }
 
-class FlutibreDatabase {
-  String path = '/home/sire/VScode/flutibre_pro/assets/books';
-  Future databasefactory() async {
-    // Init ffi loader if needed.
-    sqfliteFfiInit();
+class Flutibre extends StatelessWidget {
+  const Flutibre({Key? key}) : super(key: key);
 
-    var databaseFactory = databaseFactoryFfi;
-    var db = await databaseFactory.openDatabase('$path/book.db');
-    await db.execute('''
-  CREATE TABLE Product (
-      id INTEGER PRIMARY KEY,
-      title TEXT
-  )
-  ''');
-
-    await db.insert('Product', <String, Object?>{'title': 'Product 1'});
-    await db.insert('Product', <String, Object?>{'title': 'Product 1'});
-
-    var result = await db.query('Product');
-    print(result);
-    // prints [{id: 1, title: Product 1}, {id: 2, title: Product 1}]
-    await db.close();
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(home: Scaffold());
   }
 }
