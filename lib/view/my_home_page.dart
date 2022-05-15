@@ -13,7 +13,6 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final bookProvider = Provider.of<BookProvider>(context);
 
-    final handler = DatabaseHandler();
     Future<int> addBook() async {
       Book book = Book(
         title: bookProvider.book!.title,
@@ -21,13 +20,13 @@ class MyHomePage extends StatelessWidget {
         author_sort: bookProvider.book!.author_sort,
       );
 
-      return await handler.addBook(book);
+      return await DatabaseHandler.addBook(book);
     }
 
     return Scaffold(
       appBar: customAppBar(title),
       body: FutureBuilder(
-        future: handler.retrieveBooks(),
+        future: DatabaseHandler.retrieveBooks(),
         builder: (BuildContext context, AsyncSnapshot<List<Book>> snapshot) {
           if (snapshot.hasData) {
             return ListView.builder(

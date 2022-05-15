@@ -27,7 +27,7 @@ class DatabaseHandler {
     }
   }
 
-  Future<int> addBook(Book book) async {
+  static Future<int> addBook(Book book) async {
     final Database db = await initializeDB();
 
     if (Platform.isWindows || Platform.isLinux) {
@@ -45,7 +45,7 @@ class DatabaseHandler {
     }
   }
 
-  Future<List<Book>> retrieveBooks() async {
+  static Future<List<Book>> retrieveBooks() async {
     final Database db = await initializeDB();
 
     final List<Map<String, Object?>> queryResult = await db.query('books');
