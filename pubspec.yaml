@@ -1,4 +1,4 @@
-name: Flutibre_pro
+name: flutibre_pro
 description: A new Flutter project.
 
 # The following line prevents the package from being accidentally published to
@@ -32,6 +32,7 @@ dependencies:
     sdk: flutter
   path: ^1.8.0
   provider: ^6.0.2
+  shared_preferences: ^2.0.15
   sqflite: ^2.0.1
   sqflite_common_ffi: ^2.1.0+2
 
