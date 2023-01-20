@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'provider/counter_provider.dart';
-import 'view/my_home_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'view/homepage.dart';
 
-void main() {
-  Provider.debugCheckInvalidValueType = null;
+late SharedPreferences sharedPreferences;
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  sharedPreferences = await SharedPreferences.getInstance();
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => Counter()),
-      ],
-      child: const FlutibrePro(),
-    ),
+    const FlutibrePro(),
   );
 }
 
@@ -24,13 +21,10 @@ class FlutibrePro extends StatelessWidget {
     return MaterialApp(
       initialRoute: '/',
       routes: {
-        '/': (context) => const MyHomePage(),
+        '/': (context) => const HomePage(),
       },
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
     );
   }
 }
