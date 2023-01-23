@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import '../main.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+// ignore: must_be_immutable
+class HomePage extends HookWidget {
+  HomePage({Key? key}) : super(key: key);
 
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  int counter = prefs.getInt('counter') ?? 0;
+  ValueNotifier<int>? counter;
 
   @override
   Widget build(BuildContext context) {
+    counter = useState(prefs.getInt('counter') ?? 0);
     return Scaffold(
       drawer: drawerNavigation(context),
       appBar: AppBar(title: const Text('Flutibre Pro')),
       body: Center(
           child: Text(
-        counter.toString(),
+        counter!.value.toString(),
         style: Theme.of(context).textTheme.headline2,
       )),
       floatingActionButton: Row(
@@ -51,24 +49,19 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _incrementCounter() async {
-    await prefs.setInt('counter', counter + 1);
-    setState(() {
-      counter++;
-    });
+    await prefs.setInt('counter', counter!.value + 1);
+
+    counter!.value++;
   }
 
   void _reset() async {
     await prefs.setInt('counter', 0);
-    setState(() {
-      counter = 0;
-    });
+    counter!.value = 0;
   }
 
   void _decreaseCounter() async {
-    await prefs.setInt('counter', counter - 1);
-    setState(() {
-      counter--;
-    });
+    await prefs.setInt('counter', counter!.value - 1);
+    counter!.value--;
   }
 
   //DrawerNavigation widget
@@ -76,14 +69,16 @@ class _HomePageState extends State<HomePage> {
     return Material(
       child: Drawer(
         child: ListView(children: [
-          DrawerHeader(child: Image.asset('images/bookshelf-icon.png')),
+          DrawerHeader(child: Image.asset('images/bookshelf-icon2.png')),
           ListTile(
             leading: const Icon(Icons.home),
             title: const Text('Homepage'),
             onTap: () {
               Navigator.pop(context);
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const HomePage()));
+              Navigator.pushNamed(
+                context,
+                '/',
+              );
             },
           ),
           ListTile(
