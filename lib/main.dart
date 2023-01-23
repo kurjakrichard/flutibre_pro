@@ -28,7 +28,7 @@ class FlutibrePro extends StatelessWidget {
                 theme: value.darkTheme ? darkTheme3 : baseTheme,
                 initialRoute: '/',
                 routes: {
-                  '/': (context) => HomePage(),
+                  '/': (context) => const HomePage(),
                   '/settings': (context) => const SettingsPage(),
                 },
                 debugShowCheckedModeBanner: false,
