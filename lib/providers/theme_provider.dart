@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../main.dart';
 
-class ThemeSettings with ChangeNotifier {
-  ThemeSettings() {
+class ThemeProvider with ChangeNotifier {
+  ThemeProvider() {
     _loadSettings();
   }
 

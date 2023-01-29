@@ -1,40 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import '../main.dart';
 
 class HomePage extends HookWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage(this._title, {Key? key}) : super(key: key);
+  final String _title;
 
   @override
   Widget build(BuildContext context) {
     ValueNotifier<int>? counter = useState(prefs.getInt('counter') ?? 0);
     return Scaffold(
       drawer: drawerNavigation(context),
-      appBar: AppBar(title: const Text('Flutibre Pro')),
+      appBar: AppBar(title: Text(_title)),
       body: Center(
           child: Text(
         counter.value.toString(),
-        style: Theme.of(context).textTheme.headline2,
+        style: Theme.of(context).textTheme.displayMedium,
       )),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
-            heroTag: const Text("btn1"),
+            heroTag: 'btn1',
+            tooltip: 'Increment',
             onPressed: () {
               _incrementCounter(counter);
             },
             child: const Icon(Icons.add),
           ),
           FloatingActionButton(
-            heroTag: const Text("btn2"),
+            heroTag: 'btn2',
+            tooltip: 'Reset',
             onPressed: () {
               _reset(counter);
             },
             child: const Icon(Icons.exposure_zero_outlined),
           ),
           FloatingActionButton(
-            heroTag: const Text("btn3"),
+            heroTag: 'btn3',
+            tooltip: 'Decrement',
             onPressed: () {
               _decreaseCounter(counter);
             },
@@ -80,13 +85,10 @@ class HomePage extends HookWidget {
           ),
           ListTile(
             leading: const Icon(Icons.settings),
-            title: const Text('Settings'),
+            title: Text(AppLocalizations.of(context)!.settingspage),
             onTap: () {
               Navigator.pop(context);
-              Navigator.pushNamed(
-                context,
-                '/settings',
-              );
+              Navigator.pushNamed(context, '/settings');
             },
           )
         ]),
