@@ -4,14 +4,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class SettingsPage extends StatefulWidget {
-  const SettingsPage({Key? key}) : super(key: key);
-
-  @override
-  State<SettingsPage> createState() => _SettingsPageState();
-}
-
-class _SettingsPageState extends State<SettingsPage> {
+class SettingsPage extends StatelessWidget {
+  SettingsPage({Key? key}) : super(key: key);
   final Map<String, String> _localeList = {'en': 'English', 'hu': 'magyar'};
 
   final Map<String, String> _reverseLocaleList = {
@@ -63,9 +57,7 @@ class _SettingsPageState extends State<SettingsPage> {
             return DropdownMenuItem(value: value, child: Text(value));
           }).toList(),
           onChanged: (newValueSelected) {
-            setState(() {
-              value.setLocale(Locale(_reverseLocaleList[newValueSelected]!));
-            });
+            value.setLocale(Locale(_reverseLocaleList[newValueSelected]!));
 
             //Navigator.pop(context);
           }),
