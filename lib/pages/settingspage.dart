@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 class SettingsPage extends StatelessWidget {
   SettingsPage({Key? key}) : super(key: key);
   final Map<String, String> _localeList = {'en': 'English', 'hu': 'magyar'};
-
   final Map<String, String> _reverseLocaleList = {
     'English': 'en',
     'magyar': 'hu'
@@ -15,18 +14,18 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer(
+    return Consumer<LocaleProvider>(
       builder: (context, locale, child) => Scaffold(
         appBar: AppBar(title: Text(AppLocalizations.of(context)!.settingspage)),
         body: Wrap(alignment: WrapAlignment.center, children: [
-          const Card(
+          Card(
             child: ListTile(
-              title: Text('Theme'),
+              title: Text(AppLocalizations.of(context)!.theme),
             ),
           ),
           Consumer<ThemeProvider>(
             builder: (context, value, child) => SwitchListTile(
-              title: const Text('Dark Theme'),
+              title: Text(AppLocalizations.of(context)!.darktheme),
               value: value.darkTheme,
               onChanged: (newValue) {
                 value.toggleTheme();
@@ -34,9 +33,9 @@ class SettingsPage extends StatelessWidget {
               },
             ),
           ),
-          const Card(
+          Card(
             child: ListTile(
-              title: Text('Language selector'),
+              title: Text(AppLocalizations.of(context)!.language),
             ),
           ),
           dropDownButton()
@@ -48,13 +47,13 @@ class SettingsPage extends StatelessWidget {
   Widget dropDownButton() {
     return Consumer<LocaleProvider>(
       builder: (context, value, child) => DropdownButton<String>(
-          underline: Container(
-            height: 1,
-            color: Colors.white,
-          ),
+          icon: const Icon(Icons.arrow_downward),
+          isExpanded: true,
+          underline: Container(),
           value: _localeList[value.currentLocale.languageCode],
           items: _localeList.values.map((String value) {
-            return DropdownMenuItem(value: value, child: Text(value));
+            return DropdownMenuItem(
+                value: value, child: Center(child: Text(value)));
           }).toList(),
           onChanged: (newValueSelected) {
             value.setLocale(Locale(_reverseLocaleList[newValueSelected]!));

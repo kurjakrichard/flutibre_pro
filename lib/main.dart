@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'l10n/l10n.dart';
 import 'pages/homepage.dart';
 import 'pages/settingspage.dart';
+import 'providers/booklist_provider.dart';
 import 'providers/locale_provider.dart';
 import 'widgets/theme.dart';
 
@@ -27,7 +28,8 @@ class FlutibrePro extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
-        ChangeNotifierProvider(create: (context) => LocaleProvider())
+        ChangeNotifierProvider(create: (context) => LocaleProvider()),
+        ChangeNotifierProvider(create: (context) => BookListProvider()),
       ],
       child: Consumer<LocaleProvider>(
         builder: (context, locale, child) => Consumer<ThemeProvider>(
@@ -35,14 +37,14 @@ class FlutibrePro extends StatelessWidget {
                   localizationsDelegates: L10n.delegates,
                   locale: locale.currentLocale,
                   supportedLocales: L10n.locales,
-                  theme: value.darkTheme ? darkTheme : lightTheme,
+                  theme: value.darkTheme ? darkTheme : baseTheme,
                   initialRoute: '/',
                   routes: {
-                    '/': (context) => const HomePage('Theme Switcher'),
+                    '/': (context) => const HomePage(),
                     '/settings': (context) => SettingsPage(),
                   },
                   debugShowCheckedModeBanner: false,
-                  title: 'Theme Switcher',
+                  title: 'Flutibre Pro',
                 ))),
       ),
     );
