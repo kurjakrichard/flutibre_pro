@@ -22,7 +22,6 @@ void main() async {
 class FlutibrePro extends StatelessWidget {
   const FlutibrePro({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -37,7 +36,9 @@ class FlutibrePro extends StatelessWidget {
                   localizationsDelegates: L10n.delegates,
                   locale: locale.currentLocale,
                   supportedLocales: L10n.locales,
-                  theme: value.darkTheme ? darkTheme : baseTheme,
+                  theme: baseTheme,
+                  darkTheme: darkTheme,
+                  themeMode: value.darkTheme ? ThemeMode.dark : ThemeMode.light,
                   initialRoute: '/',
                   routes: {
                     '/': (context) => const HomePage(),

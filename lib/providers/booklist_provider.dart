@@ -1,36 +1,30 @@
+import 'package:flutibre_pro/model/booklist_item.dart';
 import 'package:flutter/material.dart';
 import '../main.dart';
 
 class BookListProvider with ChangeNotifier {
   BookListProvider() {
-    _loadSettings();
+    getBookList();
   }
 
-  int _counter = 0;
-
+  final List<BookListItem> _bookList = [];
+  final List<BookListItem> _filteredBookList = [];
   // ignore: unnecessary_getters_setters
-  int get counter => _counter;
+  List<BookListItem> get filteredBookList => _bookList;
 
-  void _loadSettings() async {
-    _counter = prefs.getInt('counter') ?? 0;
-    notifyListeners();
-  }
+  void getBookList([String? stringItem]) async {
+    _bookList.clear();
+    List<String> names = ['Ricsi', 'Dóra', 'Árpád', 'Regina', 'Pálma', 'Pálma'];
+    for (var name in names) {
+      if (stringItem == null) {
+        _bookList.add(BookListItem(name: name));
+      } else {
+        if (stringItem == name) {
+          _bookList.add(BookListItem(name: name));
+        }
 
-  void incrementCounter() async {
-    await prefs.setInt('counter', _counter + 1);
-    _counter++;
-    notifyListeners();
-  }
-
-  void reset() async {
-    await prefs.setInt('counter', 0);
-    _counter = 0;
-    notifyListeners();
-  }
-
-  void decreaseCounter() async {
-    await prefs.setInt('counter', _counter - 1);
-    _counter--;
-    notifyListeners();
+        notifyListeners();
+      }
+    }
   }
 }
