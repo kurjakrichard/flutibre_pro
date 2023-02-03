@@ -29,7 +29,6 @@ class SettingsPage extends StatelessWidget {
               value: value.darkTheme,
               onChanged: (newValue) {
                 value.toggleTheme();
-                //Navigator.pop(context);
               },
             ),
           ),
@@ -57,8 +56,6 @@ class SettingsPage extends StatelessWidget {
           }).toList(),
           onChanged: (newValueSelected) {
             value.setLocale(Locale(_reverseLocaleList[newValueSelected]!));
-
-            //Navigator.pop(context);
           }),
     );
   }

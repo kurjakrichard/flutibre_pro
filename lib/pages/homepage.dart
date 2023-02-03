@@ -71,7 +71,21 @@ class _HomePageState extends State<HomePage> {
           heroTag: 'btn1',
           tooltip: 'Increment',
           onPressed: () {
-            books.getBookList('Pálma');
+            //books.getBookList('Pálma');
+            ScaffoldMessenger.of(context).showMaterialBanner(
+              MaterialBanner(
+                leading: Icon(Icons.search),
+                content: Text('Search'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).clearMaterialBanners();
+                    },
+                    child: Text('Bezárás'),
+                  )
+                ],
+              ),
+            );
           },
           child: const Icon(Icons.add),
         ),
