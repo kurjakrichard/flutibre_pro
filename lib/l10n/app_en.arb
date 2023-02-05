@@ -20,6 +20,10 @@
   "@darktheme": {
     "description": "Dark theme"
   },
+    "librarypath": "Library path",
+  "@librarypath": {
+    "description": "Ebook library path"
+  },
   "ok": "OK",
   "@ok": {
     "description": "OK button"

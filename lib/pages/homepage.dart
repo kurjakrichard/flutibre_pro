@@ -11,8 +11,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Icon custIcon = const Icon(Icons.search);
-  bool isSearching = false;
+  TextEditingController searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -20,51 +19,49 @@ class _HomePageState extends State<HomePage> {
       builder: (context, books, child) => Scaffold(
         drawer: drawerNavigation(context),
         appBar: AppBar(
-          title: !isSearching
-              ? const Text('Flutibre Pro')
-              : TextField(
-                  onChanged: (value) {
-                    books.getBookList(value);
-                  },
-                  textInputAction: TextInputAction.go,
-                  decoration: const InputDecoration(
-                    icon: Icon(
-                      Icons.search,
-                      color: Colors.white,
-                    ),
-                    border: InputBorder.none,
-                    hintText: "Search term",
-                    hintStyle: TextStyle(color: Colors.white),
-                  ),
-                  style: const TextStyle(color: Colors.white),
-                ),
+          title: const Text('Flutibre Pro'),
           actions: <Widget>[
-            isSearching
-                ? IconButton(
-                    icon: const Icon(Icons.cancel),
-                    onPressed: () {
-                      setState(() {
-                        books.getBookList();
-                        isSearching = false;
-                      });
-                    },
-                  )
-                : IconButton(
-                    icon: const Icon(Icons.search),
-                    onPressed: () {
-                      setState(() {
-                        isSearching = true;
-                      });
-                    },
-                  )
+            IconButton(
+              icon: const Icon(Icons.search),
+              onPressed: () {
+                ScaffoldMessenger.of(context).showMaterialBanner(
+                  MaterialBanner(
+                    content: TextField(
+                      controller: searchController,
+                      onChanged: (value) {
+                        value.isEmpty
+                            ? books.toggleAllBooks()
+                            : books.filteredBookList(value);
+                      },
+                      textInputAction: TextInputAction.go,
+                      decoration: const InputDecoration(
+                        icon: Icon(
+                          Icons.search,
+                        ),
+                        border: InputBorder.none,
+                        hintText: 'Search term',
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).clearMaterialBanners();
+                        },
+                        child: const Text('Bezárás'),
+                      )
+                    ],
+                  ),
+                );
+              },
+            )
           ],
         ),
         body: ListView.builder(
             shrinkWrap: true,
-            itemCount: books.filteredBookList.length,
+            itemCount: books.currentBooks.length,
             itemBuilder: (BuildContext context, int index) {
               return ListTile(
-                title: Center(child: Text(books.filteredBookList[index].name)),
+                title: Center(child: Text(books.currentBooks[index].name)),
               );
             }),
         floatingActionButton: FloatingActionButton(
@@ -72,20 +69,6 @@ class _HomePageState extends State<HomePage> {
           tooltip: 'Increment',
           onPressed: () {
             //books.getBookList('Pálma');
-            ScaffoldMessenger.of(context).showMaterialBanner(
-              MaterialBanner(
-                leading: Icon(Icons.search),
-                content: Text('Search'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).clearMaterialBanners();
-                    },
-                    child: Text('Bezárás'),
-                  )
-                ],
-              ),
-            );
           },
           child: const Icon(Icons.add),
         ),
@@ -126,6 +109,7 @@ class _HomePageState extends State<HomePage> {
             leading: const Icon(Icons.settings),
             title: Text(AppLocalizations.of(context)!.settingspage),
             onTap: () {
+              ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
               Navigator.pop(context);
               Navigator.pushNamed(context, '/settings');
             },

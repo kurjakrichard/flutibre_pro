@@ -30,16 +30,4 @@ class BookListItem {
         has_cover = res['has_cover'],
         series_index = res['series_index'],
         path = res['path'];
-
-  Map<String, Object?> toMap() {
-    return {
-      'name': name,
-      'author_sort': author_sort,
-      'title': title,
-      'sort': sort,
-      'has_cover': has_cover,
-      'series_index': series_index,
-      'path': path,
-    };
-  }
 }
