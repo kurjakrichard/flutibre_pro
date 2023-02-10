@@ -19,22 +19,15 @@ void main() async {
   prefs = await SharedPreferences.getInstance();
   bool isPath = prefs.containsKey("path");
 
-  String path = '${prefs.getString("path")!}/metadata.db';
-
-  bool isDb = await databaseFactory.databaseExists(path);
-
-  print(isDb);
-
   runApp(
-    FlutibrePro(isPath, isDb),
+    FlutibrePro(isPath),
   );
 }
 
 class FlutibrePro extends StatelessWidget {
-  const FlutibrePro(this.isPath, this.isDb, {Key? key}) : super(key: key);
+  const FlutibrePro(this.isPath, {Key? key}) : super(key: key);
 
   final bool isPath;
-  final bool isDb;
 
   @override
   Widget build(BuildContext context) {
@@ -56,9 +49,8 @@ class FlutibrePro extends StatelessWidget {
                   scrollBehavior: CustomScrollBehavior(),
                   initialRoute: '/',
                   routes: {
-                    '/': (context) => isPath && isDb
-                        ? const HomePage()
-                        : const SettingsPage(),
+                    '/': (context) =>
+                        isPath ? const HomePage() : const SettingsPage(),
                     '/settings': (context) => const SettingsPage(),
                   },
                   debugShowCheckedModeBanner: false,

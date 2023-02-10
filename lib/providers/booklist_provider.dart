@@ -5,9 +5,8 @@ import '../repository/database_handler.dart';
 
 class BookListProvider with ChangeNotifier {
   BookListProvider() {
-    _databaseHandler = DatabaseHandler();
+    databaseHandler = DatabaseHandler();
     if (prefs.containsKey("path")) {
-      _databaseHandler = DatabaseHandler();
       getAllBooks();
     }
   }
@@ -16,7 +15,7 @@ class BookListProvider with ChangeNotifier {
   List<BookListItem> _allBooks = [];
   List<BookListItem> _currentBooks = [];
   List<BookListItem> get currentBooks => _currentBooks;
-  DatabaseHandler? _databaseHandler;
+  DatabaseHandler? databaseHandler;
 
   void filteredBookList([String? stringItem]) async {
     List<BookListItem> filteredBookList = [];
@@ -38,13 +37,14 @@ class BookListProvider with ChangeNotifier {
   void getAllBooks() async {
     _allBooks.clear();
 
-    _allBooks = await _databaseHandler!.getBookList();
+    _allBooks = await databaseHandler!.getBookList();
     _currentBooks = _allBooks;
     notifyListeners();
   }
 
   Future<List<BookListItem>> getBookList() async {
-    return await _databaseHandler!.getBookList();
+    await databaseHandler!.initialDatabase();
+    return await databaseHandler!.getBookList();
   }
 
   void toggleAllBooks() {

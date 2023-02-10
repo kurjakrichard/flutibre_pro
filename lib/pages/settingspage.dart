@@ -35,6 +35,11 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _newFolder = false;
   bool _isLoading = false;
   bool _userAborted = false;
+  @override
+  void initState() {
+    super.initState();
+    _loadPath();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +102,8 @@ class _SettingsPageState extends State<SettingsPage> {
                           copyPath('assets/Ebooks', _tempPath!);
                           _newFolder = false;
                         }
-                        await value.getBookList();
+                        await value.databaseHandler!.initialDatabase();
+                        value.getAllBooks();
                         // ignore: use_build_context_synchronously
                         Navigator.push(
                             context,
@@ -119,7 +125,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   AppLocalizations.of(context)!.cancel,
                 ),
                 onPressed: () {
-                  if (_isPath!) {
+                  if (_isPath != null && _isPath!) {
                     Navigator.pop(context);
                   }
                 },
@@ -196,8 +202,6 @@ class _SettingsPageState extends State<SettingsPage> {
           await File('$_tempPath/Ebooks/metadata.db').exists()) {
         setState(() {
           _dbpath = _tempPath;
-
-          Provider.of<BookListProvider>(context, listen: false).getBookList();
           _userAborted = _tempPath == null;
         });
       } else {
