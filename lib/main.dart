@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutibre_pro/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sqflite/sqflite.dart';
 import 'l10n/l10n.dart';
 import 'pages/homepage.dart';
 import 'pages/settingspage.dart';
@@ -51,6 +50,7 @@ class FlutibrePro extends StatelessWidget {
                   routes: {
                     '/': (context) =>
                         isPath ? const HomePage() : const SettingsPage(),
+                    '/homepage': (context) => const HomePage(),
                     '/settings': (context) => const SettingsPage(),
                   },
                   debugShowCheckedModeBanner: false,

@@ -72,63 +72,75 @@ class _SettingsPageState extends State<SettingsPage> {
               title: Text(AppLocalizations.of(context)!.librarypath),
             ),
           ),
+          ListTile(
+            title: Wrap(
+              children: [
+                Text(_dbpath ?? 'Nincs könyvtár kiválasztva',
+                    style: Theme.of(context).textTheme.bodyLarge),
+              ],
+            ),
+          ),
           Row(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(_dbpath ?? '',
-                    style: Theme.of(context).textTheme.bodyLarge),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  onPressed: () => _selectFolder(),
-                  child: Text(AppLocalizations.of(context)!.pickfolder),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: ElevatedButton(
+                    onPressed: () => _selectFolder(),
+                    child: Text(AppLocalizations.of(context)!.pickfolder),
+                  ),
                 ),
               ),
             ],
           ),
           Row(children: [
-            Consumer<BookListProvider>(
-              builder: (BuildContext context, value, Widget? child) {
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                    child: Text(AppLocalizations.of(context)!.ok),
-                    onPressed: () async {
-                      if (_tempPath != null) {
-                        _savePath(_tempPath!);
-                        if (_tempPath != null && _newFolder) {
-                          copyPath('assets/Ebooks', _tempPath!);
-                          _newFolder = false;
+            Expanded(
+              child: Consumer<BookListProvider>(
+                builder: (BuildContext context, value, Widget? child) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      child: Text(AppLocalizations.of(context)!.ok),
+                      onPressed: () async {
+                        if (_tempPath != null) {
+                          _savePath(_tempPath!);
+                          if (_tempPath != null && _newFolder) {
+                            copyPath('assets/Ebooks', _tempPath!);
+                            _newFolder = false;
+                          }
+                          await value.databaseHandler!.initialDatabase();
+                          value.getAllBooks();
+                          // ignore: use_build_context_synchronously
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const HomePage(),
+                              ));
+                        } else {
+                          String? checkPath = await _loadPath();
+                          if (checkPath != null) {
+                            Navigator.pop(context);
+                          }
                         }
-                        await value.databaseHandler!.initialDatabase();
-                        value.getAllBooks();
-                        // ignore: use_build_context_synchronously
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const HomePage(),
-                            ));
-                      } else {
-                        Navigator.pop(context);
-                      }
-                    },
-                  ),
-                );
-              },
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
-                child: Text(
-                  AppLocalizations.of(context)!.cancel,
-                ),
-                onPressed: () {
-                  if (_isPath != null && _isPath!) {
-                    Navigator.pop(context);
-                  }
+                      },
+                    ),
+                  );
                 },
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  child: Text(
+                    AppLocalizations.of(context)!.cancel,
+                  ),
+                  onPressed: () {
+                    if (_isPath != null && _isPath!) {
+                      Navigator.pop(context);
+                    }
+                  },
+                ),
               ),
             ),
           ]),
@@ -154,7 +166,6 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  // ignore: unused_element
   Future<String?> _loadPath() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _tempPath = prefs.getString('path');

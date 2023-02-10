@@ -101,7 +101,7 @@ class _HomePageState extends State<HomePage> {
               Navigator.pop(context);
               Navigator.pushNamed(
                 context,
-                '/',
+                '/homepage',
               );
             },
           ),
