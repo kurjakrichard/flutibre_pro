@@ -1,3 +1,4 @@
+import 'package:flutibre_pro/pages/book_details_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutibre_pro/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
@@ -51,6 +52,7 @@ class FlutibrePro extends StatelessWidget {
                     '/': (context) =>
                         isPath ? const HomePage() : const SettingsPage(),
                     '/homepage': (context) => const HomePage(),
+                    '/bookdetailspage': (context) => const BookDetailsPage(),
                     '/settings': (context) => const SettingsPage(),
                   },
                   debugShowCheckedModeBanner: false,

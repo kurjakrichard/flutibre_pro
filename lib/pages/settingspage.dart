@@ -119,6 +119,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         } else {
                           String? checkPath = await _loadPath();
                           if (checkPath != null) {
+                            // ignore: use_build_context_synchronously
                             Navigator.pop(context);
                           }
                         }

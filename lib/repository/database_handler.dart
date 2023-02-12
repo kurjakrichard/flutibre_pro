@@ -31,7 +31,6 @@ class DatabaseHandler {
 
   Future<Database> initialDatabase() async {
     String? path = await getPath();
-    print(path);
 
     if (path == null) {
       return await databaseFactoryFfi.openDatabase(inMemoryDatabasePath);
