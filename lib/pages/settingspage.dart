@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/booklist_provider.dart';
 import '../repository/database_handler.dart';
+import 'homepage2.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -108,14 +109,11 @@ class _SettingsPageState extends State<SettingsPage> {
                             copyPath('assets/Ebooks', _tempPath!);
                             _newFolder = false;
                           }
+
                           await value.databaseHandler!.initialDatabase();
                           value.getAllBooks();
                           // ignore: use_build_context_synchronously
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const HomePage(),
-                              ));
+                          Navigator.pushNamed(context, '/homepage');
                         } else {
                           String? checkPath = await _loadPath();
                           if (checkPath != null) {

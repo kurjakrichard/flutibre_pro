@@ -574,11 +574,12 @@ class _HomePageState extends State<HomePage> {
                             child: ElevatedButton(
                               onPressed: () async {
                                 String bookPath =
-                                    '${_path!}/${book.path}/${book.formats![0].name}.${book.formats![0].format.toLowerCase()}';
+                                    '${prefs.getString('path')}/${book.path}/${book.formats![0].name}.${book.formats![0].format.toLowerCase()}';
                                 if (Platform.isWindows) {
                                   OpenFilex.open(
                                       bookPath.replaceAll('/', '\\'));
                                 } else {
+                                  print(bookPath);
                                   OpenFilex.open(bookPath);
                                 }
                               },
