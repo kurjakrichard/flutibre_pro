@@ -30,6 +30,7 @@ class _HomePageState extends State<HomePage> {
   List<BookListItem>? _dataTableBookList;
   late List<Book> _selectedBooks;
   String? _path;
+  int _selectedIndex = 0;
   int? sortColumnIndex;
   bool isAscending = false;
   Page currentPage = Page.list;
@@ -102,35 +103,8 @@ class _HomePageState extends State<HomePage> {
                   },
                 )
               ],
-              bottom: TabBar(
-                //Azért nem kell index, mert maga a widget azonosítja a tabot.
-                labelColor: Colors.white,
-                indicatorColor: Colors.orange,
-                unselectedLabelColor: Colors.grey,
-                tabs: <Widget>[
-                  Tab(
-                    icon: Tooltip(
-                        message: AppLocalizations.of(context)!.list,
-                        child: const Icon(Icons.list)),
-                  ),
-                  Tab(
-                    icon: Tooltip(
-                        message: AppLocalizations.of(context)!.tiles,
-                        child: const Icon(Icons.grid_4x4)),
-                  ),
-                  Tab(
-                    icon: Tooltip(
-                        message: AppLocalizations.of(context)!.datatable,
-                        child: const Icon(Icons.dataset)),
-                  ),
-                ],
-                onTap: (index) {
-                  setState(() {
-                    currentPage = Page.values[index];
-                  });
-                },
-              ),
             ),
+            bottomNavigationBar: bottomNavigationBar(),
             body: IndexedStack(
               index: currentPage.index,
               children: [
@@ -163,7 +137,40 @@ class _HomePageState extends State<HomePage> {
         ));
   }
 
-  //DrawerNavigation widget
+  BottomNavigationBar bottomNavigationBar() {
+    return BottomNavigationBar(
+      showSelectedLabels: false,
+      showUnselectedLabels: false,
+      currentIndex: _selectedIndex,
+      onTap: (index) {
+        setState(() {
+          _selectedIndex = index;
+          currentPage = Page.values[index];
+        });
+      },
+      items: [
+        BottomNavigationBarItem(
+          label: '',
+          icon: Tooltip(
+              message: AppLocalizations.of(context)!.list,
+              child: const Icon(Icons.list)),
+        ),
+        BottomNavigationBarItem(
+          label: '',
+          icon: Tooltip(
+              message: AppLocalizations.of(context)!.tiles,
+              child: const Icon(Icons.grid_4x4)),
+        ),
+        BottomNavigationBarItem(
+          label: '',
+          icon: Tooltip(
+              message: AppLocalizations.of(context)!.datatable,
+              child: const Icon(Icons.dataset)),
+        ),
+      ],
+    );
+  }
+
 //DrawerNavigation widget
   Widget drawerNavigation(context) {
     return Material(
@@ -576,10 +583,8 @@ class _HomePageState extends State<HomePage> {
                                 String bookPath =
                                     '${prefs.getString('path')}/${book.path}/${book.formats![0].name}.${book.formats![0].format.toLowerCase()}';
                                 if (Platform.isWindows) {
-                                  OpenFilex.open(
-                                      bookPath.replaceAll('/', '\\'));
+                                  (bookPath.replaceAll('/', '\\'));
                                 } else {
-                                  print(bookPath);
                                   OpenFilex.open(bookPath);
                                 }
                               },

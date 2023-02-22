@@ -111,7 +111,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           }
 
                           await value.databaseHandler!.initialDatabase();
-                          value.getAllBooks();
+                          value.initialBookItemList();
                           // ignore: use_build_context_synchronously
                           Navigator.pushNamed(context, '/homepage');
                         } else {

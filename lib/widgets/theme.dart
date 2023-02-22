@@ -15,6 +15,10 @@ ThemeData darkTheme3 = ThemeData(
       .copyWith(secondary: Colors.blueAccent, brightness: Brightness.dark),
 );
 ThemeData baseTheme = ThemeData(
+  bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: Colors.cyan,
+      unselectedItemColor: Colors.grey,
+      selectedItemColor: Colors.white),
   appBarTheme: const AppBarTheme(
     backgroundColor: Colors.cyan,
     foregroundColor: Colors.white,

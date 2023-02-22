@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
-
 import '../main.dart';
 import '../model/book.dart';
 import '../utils/ebook_service.dart';
