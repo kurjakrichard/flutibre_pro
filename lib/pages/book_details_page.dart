@@ -116,14 +116,10 @@ class _BookDetailsContentState extends State<BookDetailsContent> {
                             Expanded(
                               child: ElevatedButton(
                                 onPressed: () {
-                                  String bookPath = widget.book!.path
-                                      .replaceAll('cover.jpg',
-                                          '${widget.book!.formats![0].name}.${widget.book!.formats![0].format.toLowerCase()}')
-                                      .replaceAll('cover.png',
-                                          '${widget.book!.formats![0].name}.${widget.book!.formats![0].format.toLowerCase()}');
+                                  String bookPath =
+                                      '${prefs.getString('path')}/${widget.book!.path}/${widget.book!.formats![0].name}.${widget.book!.formats![0].format.toLowerCase()}';
                                   if (Platform.isWindows) {
-                                    OpenFilex.open(
-                                        bookPath.replaceAll('/', '\\'));
+                                    (bookPath.replaceAll('/', '\\'));
                                   } else {
                                     OpenFilex.open(bookPath);
                                   }
@@ -196,14 +192,10 @@ class _BookDetailsContentState extends State<BookDetailsContent> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Text(detailType,
-            style: Theme.of(context).textTheme.displayMedium,
-            overflow: TextOverflow.ellipsis),
+        Text(detailType, overflow: TextOverflow.ellipsis),
         const VerticalDivider(),
         Flexible(
-          child: Text(detailContent,
-              style: Theme.of(context).textTheme.bodyLarge,
-              overflow: TextOverflow.ellipsis),
+          child: Text(detailContent, overflow: TextOverflow.ellipsis),
         ),
       ],
     );

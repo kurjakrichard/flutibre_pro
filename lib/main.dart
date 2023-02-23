@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'l10n/l10n.dart';
 import 'pages/homepage.dart';
-import 'pages/homepage2.dart';
 import 'pages/settingspage.dart';
 import 'providers/booklist_provider.dart';
 import 'providers/locale_provider.dart';

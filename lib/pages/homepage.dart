@@ -26,10 +26,8 @@ class _HomePageState extends State<HomePage> {
   TextEditingController searchController = TextEditingController();
   final Book _book = Book();
   final EbookService _bookService = EbookService();
-  late Future<List<BookListItem>>? _bookList;
   List<BookListItem>? _dataTableBookList;
   late List<Book> _selectedBooks;
-  String? _path;
   int _selectedIndex = 0;
   int? sortColumnIndex;
   bool isAscending = false;
@@ -44,10 +42,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
     bookDetails = bookDetailsItem();
-    _bookList =
-        Provider.of<BookListProvider>(context, listen: false).getBookList();
   }
 
   @override
