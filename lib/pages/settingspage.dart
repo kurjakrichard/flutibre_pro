@@ -1,7 +1,6 @@
 // ignore_for_file: unused_field
 
 import 'dart:io';
-import 'package:flutibre_pro/pages/homepage.dart';
 import 'package:io/io.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutibre_pro/providers/locale_provider.dart';
@@ -13,7 +12,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/booklist_provider.dart';
 import '../repository/database_handler.dart';
-import 'homepage2.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
