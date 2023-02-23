@@ -111,11 +111,11 @@ class _HomePageState extends State<HomePage> {
                 LayoutBuilder(builder: (context, constraints) {
                   var isWideLayout = constraints.maxWidth > 850;
                   if (!isWideLayout) {
-                    return listView(false);
+                    return listView(false, books);
                   } else {
                     return Row(
                       children: [
-                        Expanded(child: listView(true)),
+                        Expanded(child: listView(true, books)),
                         const VerticalDivider(
                           color: Colors.cyan,
                           thickness: 3,
@@ -129,8 +129,8 @@ class _HomePageState extends State<HomePage> {
                     );
                   }
                 }),
-                gridView(),
-                //dataTable(),
+                gridView(books),
+                dataTable(books),
               ],
             ),
           ),
@@ -215,10 +215,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   //ListView tab
-  FutureBuilder listView(bool isWide) {
+  FutureBuilder listView(bool isWide, BookListProvider books) {
     Book? selectedBook;
     return FutureBuilder(
-        future: _bookList,
+        future: books.currentBooks2,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.hasData) {
             return ListView.builder(
@@ -312,10 +312,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   //GridView tab
-  FutureBuilder gridView() {
+  FutureBuilder gridView(BookListProvider books) {
     int size = MediaQuery.of(context).size.width.round();
     return FutureBuilder(
-        future: _bookList,
+        future: books.currentBooks2,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.hasData) {
             return GridView.builder(
@@ -374,10 +374,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   //DataTable tab
-  Widget dataTable() {
+  Widget dataTable(BookListProvider books) {
     _selectedBooks = [];
     return FutureBuilder(
-        future: _bookList,
+        future: books.currentBooks2,
         builder:
             (BuildContext context, AsyncSnapshot<List<BookListItem>> snapshot) {
           if (snapshot.hasData) {
@@ -395,10 +395,20 @@ class _HomePageState extends State<HomePage> {
                       // ignore: iterable_contains_unrelated_type
                       selected: _selectedBooks.contains(book),
                       onSelectChanged: (value) async {
+                        List<Data>? formats =
+                            await _bookService.readBookFormats(book.id);
+                        Book selectedBook = Book(
+                            id: book.id,
+                            title: book.title,
+                            author_sort: book.author_sort,
+                            path: book.path,
+                            has_cover: book.has_cover,
+                            series_index: book.series_index,
+                            formats: formats);
                         Navigator.pushNamed(
                           context,
-                          '/BookDetailsPage',
-                          arguments: book,
+                          '/bookdetailspage',
+                          arguments: selectedBook,
                         );
                       },
                       cells: [
@@ -622,14 +632,10 @@ class _HomePageState extends State<HomePage> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Text(detailType,
-            style: Theme.of(context).textTheme.displayMedium,
-            overflow: TextOverflow.ellipsis),
+        Text(detailType, overflow: TextOverflow.ellipsis),
         const VerticalDivider(),
         Flexible(
-          child: Text(detailContent,
-              style: Theme.of(context).textTheme.bodyLarge,
-              overflow: TextOverflow.ellipsis),
+          child: Text(detailContent, overflow: TextOverflow.ellipsis),
         ),
       ],
     );

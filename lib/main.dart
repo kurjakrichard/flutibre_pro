@@ -51,8 +51,8 @@ class FlutibrePro extends StatelessWidget {
                   initialRoute: '/',
                   routes: {
                     '/': (context) =>
-                        isPath ? const HomePage2() : const SettingsPage(),
-                    '/homepage': (context) => const HomePage2(),
+                        isPath ? const HomePage() : const SettingsPage(),
+                    '/homepage': (context) => const HomePage(),
                     '/bookdetailspage': (context) => const BookDetailsPage(),
                     '/settings': (context) => const SettingsPage(),
                   },
