@@ -1,8 +1,9 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'dart:io';
-// ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as p;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import '../model/book.dart';
@@ -109,7 +110,7 @@ class DatabaseHandler {
 
     for (var item in bookMapList) {
       Book book = Book.fromMap(item);
-      book.formats = await getFormatsById(book.id);
+      book.formats = await getFormatsById(book.id!);
       bookList.add(book);
     }
     return bookList;

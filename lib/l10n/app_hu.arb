@@ -6,6 +6,11 @@
     "theme": "Téma",
     "darktheme": "Sötét mód",
     "librarypath": "Könyvtár útvonal",
+    "nolibraryselected": "Nincs könyvtár kiválasztva",
+    "chosepath": "Válasszd ki a Calibre könyvtárat!",
+    "newlibrary": "Üres mappa esetén új könyvtár jön létre",
+    "emptylibrary": "Üres könyvtár",
+    "nobookselected": "Nincs könyv kiválasztva",
     "ok": "OK",
     "cancel": "Mégse",
     "list": "Lista nézet",
@@ -22,5 +27,7 @@
     "wanttodelete": "Biztosan törlöd?",
     "back": "Vissza",
     "open": "Megnyit",
+    "openbook": "Könyv megnyitás",
+    "comment": "Tartalom",
     "pickfolder": "Mappa választó"
 }

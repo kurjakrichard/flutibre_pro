@@ -7,9 +7,15 @@ class ThemeProvider with ChangeNotifier {
   }
 
   bool _darkTheme = false;
-
+  bool _downloading = false;
   // ignore: unnecessary_getters_setters
   bool get darkTheme => _darkTheme;
+  bool get downloading => _downloading;
+
+  set downloading(bool value) {
+    _downloading = value;
+    notifyListeners();
+  }
 
   void _loadSettings() async {
     _darkTheme = prefs.getBool('darkTheme') ?? false;

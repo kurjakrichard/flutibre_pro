@@ -1,4 +1,5 @@
 import 'package:flutibre_pro/pages/book_details_page.dart';
+import 'package:flutibre_pro/pages/loadingpage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutibre_pro/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +11,7 @@ import 'providers/booklist_provider.dart';
 import 'providers/locale_provider.dart';
 import 'utils/custom_scroll_behavior.dart';
 import 'widgets/theme.dart';
+import 'dart:io' as io;
 
 late SharedPreferences prefs;
 
@@ -17,17 +19,24 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Provider.debugCheckInvalidValueType = null;
   prefs = await SharedPreferences.getInstance();
-  bool isPath = prefs.containsKey("path");
+  bool isMetadataDb = false;
+
+  try {
+    await io.File('${prefs.getString('path')}/metadata.db').length();
+    isMetadataDb = true;
+  } on Exception {
+    prefs.remove('path');
+  }
 
   runApp(
-    FlutibrePro(isPath),
+    FlutibrePro(isMetadataDb),
   );
 }
 
 class FlutibrePro extends StatelessWidget {
-  const FlutibrePro(this.isPath, {Key? key}) : super(key: key);
+  const FlutibrePro(this.isMetadataDb, {Key? key}) : super(key: key);
 
-  final bool isPath;
+  final bool isMetadataDb;
 
   @override
   Widget build(BuildContext context) {
@@ -39,25 +48,29 @@ class FlutibrePro extends StatelessWidget {
       ],
       child: Consumer<LocaleProvider>(
         builder: (context, locale, child) => Consumer<ThemeProvider>(
-            builder: ((context, value, child) => MaterialApp(
-                  localizationsDelegates: L10n.delegates,
-                  locale: locale.currentLocale,
-                  supportedLocales: L10n.locales,
-                  theme: baseTheme,
-                  darkTheme: darkTheme,
-                  themeMode: value.darkTheme ? ThemeMode.dark : ThemeMode.light,
-                  scrollBehavior: CustomScrollBehavior(),
-                  initialRoute: '/',
-                  routes: {
-                    '/': (context) =>
-                        isPath ? const HomePage() : const SettingsPage(),
-                    '/homepage': (context) => const HomePage(),
-                    '/bookdetailspage': (context) => const BookDetailsPage(),
-                    '/settings': (context) => const SettingsPage(),
-                  },
-                  debugShowCheckedModeBanner: false,
-                  title: 'Flutibre Pro',
-                ))),
+            builder: ((context, value, child) => value.downloading
+                ? MaterialApp(
+                    localizationsDelegates: L10n.delegates,
+                    locale: locale.currentLocale,
+                    supportedLocales: L10n.locales,
+                    theme: baseTheme,
+                    darkTheme: darkTheme,
+                    themeMode:
+                        value.darkTheme ? ThemeMode.dark : ThemeMode.light,
+                    scrollBehavior: CustomScrollBehavior(),
+                    initialRoute: '/',
+                    routes: {
+                      '/': (context) => isMetadataDb
+                          ? const HomePage()
+                          : const SettingsPage(),
+                      '/homepage': (context) => const HomePage(),
+                      '/bookdetailspage': (context) => BookDetailsPage(),
+                      '/settings': (context) => const SettingsPage(),
+                    },
+                    debugShowCheckedModeBanner: false,
+                    title: 'Flutibre Pro',
+                  )
+                : LoadingPage(context: context))),
       ),
     );
   }

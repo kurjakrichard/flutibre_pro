@@ -383,7 +383,7 @@ class _HomePageState extends State<HomePage> {
                 scrollDirection: Axis.horizontal,
                 child: DataTable(
                   showCheckboxColumn: false,
-                  dataRowHeight: 40,
+                  dataRowMinHeight: 40,
                   columns: getColumns(_columns),
                   rows: snapshot.data!.map((book) {
                     return DataRow(

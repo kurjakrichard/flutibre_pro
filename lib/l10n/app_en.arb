@@ -20,9 +20,29 @@
   "@darktheme": {
     "description": "Dark theme"
   },
-    "librarypath": "Library path",
+  "nolibraryselected": "No library selected",
+  "@librarypath": {
+    "description": "Calibre library selection"
+  },
+  "librarypath": "Library path",
   "@librarypath": {
     "description": "Ebook library path"
+  },
+  "chosepath": "Please select Calibre library.",
+  "@librarypath": {
+    "description": "Calibre library selection"
+  },
+  "newlibrary": "Pick an empty folder to create a new library",
+  "@librarypath": {
+    "description": "New library"
+  },
+  "emptylibrary": "Empty library",
+  "@librarypath": {
+    "description": "Empty library"
+  },
+  "nobookselected": "No book selected",
+  "@librarypath": {
+    "description": "No book selected"
   },
   "ok": "OK",
   "@ok": {
@@ -91,6 +111,14 @@
   "open": "Open",
   "@open": {
     "description": "Open button"
+  },
+  "openbook": "Open book",
+  "@open": {
+    "description": "Open button"
+  },
+  "comment": "Comment",
+  "@open": {
+    "description": "Comment"
   },
   "pickfolder": "Pick folder",
   "@pickfolder": {

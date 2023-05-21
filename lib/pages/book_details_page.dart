@@ -1,23 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:open_filex/open_filex.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:io';
 import '../main.dart';
 import '../model/book.dart';
-import '../utils/ebook_service.dart';
+import '../model/data.dart';
 
+// ignore: must_be_immutable
 class BookDetailsPage extends StatelessWidget {
-  const BookDetailsPage({Key? key}) : super(key: key);
-
+  BookDetailsPage({Key? key, this.book}) : super(key: key);
+  Book? book;
   @override
   Widget build(BuildContext context) {
     var routeSettings = ModalRoute.of(context)!.settings;
-    var book = routeSettings.arguments as Book;
-    {
-      return BookDetailsContent(
-        book: book,
-      );
+
+    if (routeSettings.arguments != null) {
+      book = routeSettings.arguments as Book;
     }
+
+    return BookDetailsContent(
+      book: book,
+    );
   }
 }
 
@@ -30,21 +33,13 @@ class BookDetailsContent extends StatefulWidget {
 }
 
 class _BookDetailsContentState extends State<BookDetailsContent> {
-  final EbookService _bookService = EbookService();
-  String formats = "";
-  String? _path;
   @override
   void initState() {
     super.initState();
-    getPath();
   }
 
   @override
   Widget build(BuildContext context) {
-    List<String> formats = [];
-    for (var item in widget.book!.formats!) {
-      formats.add(item.format.toLowerCase());
-    }
     return Scaffold(
         appBar: AppBar(
           title: Text(
@@ -60,102 +55,81 @@ class _BookDetailsContentState extends State<BookDetailsContent> {
           ],
         ),
         body: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: <Widget>[
-                Expanded(
-                  child: loadCover(),
-                ),
-                SizedBox(
-                  height: 160,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
+          padding: const EdgeInsets.all(24.0),
+          child: ListView(
+            children: [
+              ConstrainedBox(
+                constraints:
+                    BoxConstraints.loose(const Size(double.minPositive, 450)),
+                child: loadCover(),
+              ),
+              const SizedBox(
+                height: 16,
+              ),
+              bookDetailElement(
+                  detailType: '${AppLocalizations.of(context)!.title}: ',
+                  detailContent: widget.book!.title),
+              bookDetailElement(
+                  detailType: '${AppLocalizations.of(context)!.author}: ',
+                  detailContent: widget.book!.authors![0].name),
+              const SizedBox(
+                height: 8,
+              ),
+              Padding(
+                  padding: const EdgeInsets.only(bottom: 6.0),
+                  child: Wrap(children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6.0),
+                      child: Text(
+                        '${AppLocalizations.of(context)!.openbook}:  ',
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    for (Data item in widget.book!.formats!)
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            bookDetailElement(
-                                detailType: 'Title:',
-                                detailContent: widget.book!.title),
-                            bookDetailElement(
-                                detailType: 'Author:',
-                                detailContent: widget.book!.author_sort),
-                            Text(
-                              'Formats: ${formats.toString().replaceAll('[', '').replaceAll(']', '')}',
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                          ],
+                        padding: const EdgeInsets.only(right: 16.0, bottom: 16),
+                        child: ElevatedButton(
+                          style: ButtonStyle(minimumSize:
+                              MaterialStateProperty.resolveWith((states) {
+                            if (states.contains(MaterialState.disabled)) {
+                              return const Size(65, 35);
+                            }
+                            return const Size(65, 35);
+                          })),
+                          onPressed: () {
+                            String bookPath =
+                                '${prefs.getString('path')}/${widget.book!.path}/${widget.book!.formats![0].name}.${item.format.toLowerCase()}';
+
+                            OpenFilex.open(bookPath);
+                          },
+                          child: Text(
+                            item.format.toLowerCase(),
+                            style: const TextStyle(fontSize: 16),
+                          ),
                         ),
                       ),
-                      Expanded(
-                        child: Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                style: TextButton.styleFrom(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 15),
-                                  backgroundColor: Colors.cyan,
-                                ),
-                                child: const Text(
-                                  'Back',
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 15,
-                            ),
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  String bookPath =
-                                      '${prefs.getString('path')}/${widget.book!.path}/${widget.book!.formats![0].name}.${widget.book!.formats![0].format.toLowerCase()}';
-                                  OpenFilex.open(bookPath);
-                                },
-                                style: TextButton.styleFrom(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 15),
-                                  backgroundColor: Colors.cyan,
-                                ),
-                                child: const Text(
-                                  'Open',
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            )));
-  }
-
-  void getPath() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    _path = prefs.getString('path');
-
-    setState(() {
-      _path;
-    });
+                  ])),
+              bookDetailElement(
+                detailType: '${AppLocalizations.of(context)!.comment}:  ',
+                detailContent: widget.book!.comment!.text,
+              )
+            ],
+          ),
+        ));
   }
 
   Image loadCover() {
     int hasCover = widget.book!.has_cover;
     String path = widget.book!.path;
     String bookPath = '${prefs.getString('path')}/$path/cover.jpg';
+
     return hasCover == 1
-        ? Image.file(File(bookPath))
-        : Image.asset('images/cover.png');
+        ? Image.file(
+            File(bookPath),
+            height: 600,
+          )
+        : Image.asset('images/cover.png', fit: BoxFit.contain);
   }
 
   Future<dynamic> deleteDialog(BuildContext context) {
@@ -174,7 +148,8 @@ class _BookDetailsContentState extends State<BookDetailsContent> {
             child: const Text('Ok'),
             onPressed: () {
               Navigator.pop(context);
-              _bookService.deleteBook(widget.book!.id);
+              // ignore: todo
+              //TODO
               Navigator.pop(context);
             },
           ),
@@ -185,13 +160,19 @@ class _BookDetailsContentState extends State<BookDetailsContent> {
 
   Widget bookDetailElement(
       {required String detailType, required String detailContent}) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.start,
       children: <Widget>[
-        Text(detailType, overflow: TextOverflow.ellipsis),
-        const VerticalDivider(),
-        Flexible(
-          child: Text(detailContent, overflow: TextOverflow.ellipsis),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
+          child: Text(
+            detailType,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
+          child: Text(detailContent, style: const TextStyle(fontSize: 16)),
         ),
       ],
     );
