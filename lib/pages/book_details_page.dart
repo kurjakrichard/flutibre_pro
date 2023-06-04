@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+// ignore: depend_on_referenced_packages
+import 'package:html/parser.dart';
 import 'dart:io';
 import '../main.dart';
 import '../model/book.dart';
 import '../model/data.dart';
+import '../providers/booklist_provider.dart';
+import '../providers/shared_preferences_provider.dart';
 
 // ignore: must_be_immutable
 class BookDetailsPage extends StatelessWidget {
   BookDetailsPage({Key? key, this.book}) : super(key: key);
   Book? book;
+
   @override
   Widget build(BuildContext context) {
     var routeSettings = ModalRoute.of(context)!.settings;
@@ -24,15 +30,17 @@ class BookDetailsPage extends StatelessWidget {
   }
 }
 
-class BookDetailsContent extends StatefulWidget {
-  const BookDetailsContent({Key? key, this.book}) : super(key: key);
+class BookDetailsContent extends ConsumerStatefulWidget {
+  const BookDetailsContent({Key? key, this.book, this.mainContext})
+      : super(key: key);
+  final BuildContext? mainContext;
   final Book? book;
 
   @override
-  State<BookDetailsContent> createState() => _BookDetailsContentState();
+  ConsumerState<BookDetailsContent> createState() => _BookDetailsContentState();
 }
 
-class _BookDetailsContentState extends State<BookDetailsContent> {
+class _BookDetailsContentState extends ConsumerState<BookDetailsContent> {
   @override
   void initState() {
     super.initState();
@@ -47,6 +55,7 @@ class _BookDetailsContentState extends State<BookDetailsContent> {
           ),
           actions: [
             IconButton(
+              tooltip: 'Delete book',
               icon: const Icon(Icons.delete),
               onPressed: () {
                 deleteDialog(context);
@@ -60,7 +69,7 @@ class _BookDetailsContentState extends State<BookDetailsContent> {
             children: [
               ConstrainedBox(
                 constraints:
-                    BoxConstraints.loose(const Size(double.minPositive, 450)),
+                    BoxConstraints.loose(const Size(double.minPositive, 400)),
                 child: loadCover(),
               ),
               const SizedBox(
@@ -111,9 +120,10 @@ class _BookDetailsContentState extends State<BookDetailsContent> {
                       ),
                   ])),
               bookDetailElement(
-                detailType: '${AppLocalizations.of(context)!.comment}:  ',
-                detailContent: widget.book!.comment!.text,
-              )
+                  detailType: '${AppLocalizations.of(context)!.comment}:  ',
+                  detailContent:
+                      parse(widget.book!.comment!.text).documentElement?.text ??
+                          ''),
             ],
           ),
         ));
@@ -129,28 +139,40 @@ class _BookDetailsContentState extends State<BookDetailsContent> {
             File(bookPath),
             height: 600,
           )
-        : Image.asset('images/cover.png', fit: BoxFit.contain);
+        : Image.asset('images/cover.png');
   }
 
   Future<dynamic> deleteDialog(BuildContext context) {
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Want to delete'),
+        title: Text(AppLocalizations.of(context)!.wanttodelete),
         actions: [
           TextButton(
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
             onPressed: () {
               Navigator.pop(context);
             },
           ),
           TextButton(
-            child: const Text('Ok'),
-            onPressed: () {
+            child: Text(AppLocalizations.of(context)!.ok),
+            onPressed: () async {
               Navigator.pop(context);
-              // ignore: todo
-              //TODO
-              Navigator.pop(context);
+              Directory dir = Directory(
+                  '${ref.read(sharedPreferencesProvider).getString('path')!}/${widget.book!.path}');
+              Directory parentDir = Directory(
+                  '${ref.read(sharedPreferencesProvider).getString('path')!}/${widget.book!.path.split('/')[0]}');
+              await dir.delete(recursive: true);
+              bool isEmpty = await Directory(
+                      '${ref.read(sharedPreferencesProvider).getString('path')!}/${widget.book!.path.split('/')[0]}')
+                  .list()
+                  .isEmpty;
+              if (isEmpty) {
+                parentDir.delete(recursive: true);
+              }
+              ref.read(bookListProvider.notifier).deleteBook(widget.book!.id);
+              // ignore: use_build_context_synchronously
+              Navigator.maybePop(context);
             },
           ),
         ],

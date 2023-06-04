@@ -3,15 +3,50 @@
   "user_categories": {},
   "saved_searches": {},
   "grouped_search_terms": {},
-  "tag_browser_hidden_categories": [],
   "library_view books view state": {
+    "column_alignment": {
+      "pubdate": "center",
+      "size": "center",
+      "timestamp": "center"
+    },
+    "column_positions": {
+      "authors": 2,
+      "languages": 11,
+      "last_modified": 10,
+      "ondevice": 0,
+      "pubdate": 9,
+      "publisher": 8,
+      "rating": 5,
+      "series": 7,
+      "size": 4,
+      "tags": 6,
+      "timestamp": 3,
+      "title": 1
+    },
+    "column_sizes": {
+      "authors": 234,
+      "languages": 0,
+      "last_modified": 0,
+      "pubdate": 80,
+      "publisher": 72,
+      "rating": 97,
+      "series": 86,
+      "size": 110,
+      "tags": 76,
+      "timestamp": 136,
+      "title": 390
+    },
     "hidden_columns": [
       "last_modified",
       "languages"
     ],
-    "last_modified_injected": true,
     "languages_injected": true,
+    "last_modified_injected": true,
     "sort_history": [
+      [
+        "timestamp",
+        false
+      ],
       [
         "size",
         true
@@ -19,60 +54,8 @@
       [
         "timestamp",
         false
-      ],
-      [
-        "title",
-        true
-      ],
-      [
-        "series",
-        true
-      ],
-      [
-        "authors",
-        true
-      ],
-      [
-        "title",
-        true
-      ],
-      [
-        "timestamp",
-        false
       ]
-    ],
-    "column_positions": {
-      "ondevice": 0,
-      "title": 1,
-      "authors": 2,
-      "timestamp": 5,
-      "size": 8,
-      "rating": 4,
-      "tags": 6,
-      "series": 3,
-      "publisher": 7,
-      "pubdate": 9,
-      "last_modified": 10,
-      "languages": 11
-    },
-    "column_sizes": {
-      "title": 387,
-      "authors": 278,
-      "timestamp": 82,
-      "size": 110,
-      "rating": 94,
-      "tags": 75,
-      "series": 84,
-      "publisher": 72,
-      "pubdate": 80,
-      "last_modified": 0,
-      "languages": 0
-    },
-    "column_alignment": {
-      "pubdate": "center",
-      "size": "center",
-      "timestamp": "center"
-    }
+    ]
   },
   "books view split pane state": {
     "column_positions": {
@@ -104,6 +87,18 @@
     },
     "hidden_columns": []
   },
+  "tag_browser_hidden_categories": [],
+  "tag_browser_category_order": [
+    "authors",
+    "languages",
+    "series",
+    "formats",
+    "publisher",
+    "rating",
+    "news",
+    "tags",
+    "identifiers"
+  ],
   "field_metadata": {
     "au_map": {
       "column": null,
@@ -267,6 +262,24 @@
         "identifiers",
         "identifier",
         "isbn"
+      ],
+      "table": null
+    },
+    "in_tag_browser": {
+      "column": null,
+      "datatype": "text",
+      "display": {},
+      "is_category": false,
+      "is_csp": false,
+      "is_custom": false,
+      "is_editable": true,
+      "is_multiple": {},
+      "kind": "field",
+      "label": "in_tag_browser",
+      "name": null,
+      "rec_index": 25,
+      "search_terms": [
+        "in_tag_browser"
       ],
       "table": null
     },
@@ -617,15 +630,10 @@
       "table": null
     }
   },
-  "tag_browser_category_order": [
-    "authors",
-    "languages",
-    "series",
-    "formats",
-    "publisher",
-    "rating",
-    "news",
-    "tags",
-    "identifiers"
+  "gui_view_history": [
+    [
+      1,
+      "Flutibre user manual"
+    ]
   ]
 }

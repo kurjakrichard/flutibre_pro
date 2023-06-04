@@ -1,16 +1,16 @@
 import 'package:delayed_display/delayed_display.dart';
-import 'package:flutibre_pro/providers/theme_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../main.dart';
 
-class LoadingPage extends StatefulWidget {
-  const LoadingPage({Key? key, required this.context}) : super(key: key);
-  final BuildContext context;
+class LoadingPage extends ConsumerStatefulWidget {
+  const LoadingPage({Key? key}) : super(key: key);
+
   @override
-  State<LoadingPage> createState() => _LoadingScreenState();
+  ConsumerState<LoadingPage> createState() => _LoadingScreenState();
 }
 
-class _LoadingScreenState extends State<LoadingPage> {
+class _LoadingScreenState extends ConsumerState<LoadingPage> {
   final Duration initialDelay = const Duration(seconds: 0);
   @override
   initState() {
@@ -19,10 +19,9 @@ class _LoadingScreenState extends State<LoadingPage> {
   }
 
   void wait() async {
-    await Future.delayed(const Duration(seconds: 6));
+    await Future.delayed(const Duration(seconds: 3));
 
-    // ignore: use_build_context_synchronously
-    widget.context.read<ThemeProvider>().downloading = true;
+    ref.read(loadProvider.notifier).state = true;
   }
 
   @override
@@ -50,10 +49,10 @@ class _LoadingScreenState extends State<LoadingPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  delayedDisplay(0, 'Loading'),
-                  delayedDisplay(2, '.'),
-                  delayedDisplay(3, '.'),
-                  delayedDisplay(4, '.'),
+                  delayedDisplay(100, 'Loading'),
+                  delayedDisplay(500, '.'),
+                  delayedDisplay(1000, '.'),
+                  delayedDisplay(1500, '.'),
                 ],
               ),
             ),
@@ -65,7 +64,7 @@ class _LoadingScreenState extends State<LoadingPage> {
 
   Widget delayedDisplay(int delay, String displayText) {
     return DelayedDisplay(
-      delay: Duration(seconds: initialDelay.inSeconds + delay),
+      delay: Duration(milliseconds: initialDelay.inSeconds + delay),
       child: Text(
         displayText,
         style: const TextStyle(

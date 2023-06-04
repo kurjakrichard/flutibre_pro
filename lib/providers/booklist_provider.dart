@@ -1,58 +1,86 @@
-import 'package:flutibre_pro/model/booklist_item.dart';
-import 'package:flutter/material.dart';
-import '../main.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../repository/database_handler.dart';
+import 'book_list_state.dart';
 
-class BookListProvider with ChangeNotifier {
-  BookListProvider() {
-    databaseHandler = DatabaseHandler();
-    if (prefs.containsKey("path")) {
-      initialBookItemList();
-      _allBooks2 = databaseHandler!.getBookList();
-      _currentBooks2 = _allBooks2;
+final databaseProvider = Provider((ref) => DatabaseHandler.createInstance());
+
+final bookListProvider = StateNotifierProvider<BookListNotifier, BookListState>(
+    (ref) => BookListNotifier(ref));
+
+class BookListNotifier extends StateNotifier<BookListState> {
+  BookListNotifier(this.ref)
+      : _databaseProvider = ref.watch(databaseProvider),
+        super(BookListInitial()) {
+    loadBookItemList();
+  }
+  final Ref ref;
+  final DatabaseHandler _databaseProvider;
+
+  Future<void> loadBookItemList() async {
+    state = BookListLoading();
+    try {
+      await Future.delayed(const Duration(seconds: 2));
+
+      final bookList = await _databaseProvider.getBookItemList();
+      if (bookList.isEmpty) {
+        state = BookListEmpty();
+      } else {
+        state = BookListLoaded(
+          bookList: bookList,
+        );
+      }
+    } catch (e) {
+      print(e);
+      state = BookListFailure();
+      throw Exception();
     }
   }
 
-  late Future<List<BookListItem>>? _allBooks2;
-  late Future<List<BookListItem>>? _currentBooks2;
-  List<BookListItem> _allBooks = [];
-  List<BookListItem> _currentBooks = [];
-  Future<List<BookListItem>>? get currentBooks2 => _currentBooks2;
-  List<BookListItem> get currentBooks => _currentBooks;
-  DatabaseHandler? databaseHandler;
+  Future<void> filteredBookItemList(String searchItem) async {
+    state = BookListLoading();
+    try {
+      //await Future.delayed(const Duration(seconds: 2));
 
-  Future<void> filteredBookList(String? searchItem) async {
-    if (searchItem == null) {
-      initialBookItemList();
-    } else {
-      List<BookListItem> filteredBookList = [];
-      late Future<List<BookListItem>> filteredBookList2;
-      filteredBookList = await databaseHandler!.getResultBookList(searchItem);
-      filteredBookList2 = databaseHandler!.getResultBookList(searchItem);
-      _currentBooks2 = filteredBookList2;
-      _currentBooks = filteredBookList;
+      final bookList = await _databaseProvider.getResultBookList(searchItem);
+      if (bookList.isEmpty) {
+        state = BookListEmpty();
+      } else {
+        state = FilteredBookListLoaded(
+          bookList: bookList,
+        );
+      }
+    } catch (e) {
+      state = BookListFailure();
+      throw Exception();
     }
-
-    notifyListeners();
   }
 
-  void initialBookItemList() async {
-    _allBooks.clear();
-    _allBooks2 = databaseHandler!.getBookList();
-    _allBooks = await databaseHandler!.getBookList();
-    _currentBooks2 = _allBooks2;
-    _currentBooks = _allBooks;
-    notifyListeners();
+  Future<void> deleteBook(id) async {
+    state = BookListLoading();
+    await Future.delayed(const Duration(seconds: 2));
+    try {
+      _databaseProvider.deleteBook(id);
+      loadBookItemList();
+    } on Exception {
+      state = BookListFailure();
+    }
+  }
+/*
+  Future<void> editBook(Book book) async {
+    Book newBook = book;
+    state = BookListLoading();
+    try {
+      await Future.delayed(const Duration(seconds: 2));
+      if (book.id == null) {
+        await _databaseProvider.insertBook(newBook);
+      } else {
+        await _databaseProvider.updateBook(newBook);
+      }
+      state = BookListSuccess();
+    } on Exception {
+      state = BookListFailure();
+    }
   }
 
-  Future<List<BookListItem>> getBookList() async {
-    await databaseHandler!.initialDatabase();
-    return await databaseHandler!.getBookList();
-  }
-
-  void toggleAllBooks() {
-    _currentBooks = _allBooks;
-    _currentBooks2 = _allBooks2;
-    notifyListeners();
-  }
+ */
 }
