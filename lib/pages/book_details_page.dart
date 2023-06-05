@@ -6,6 +6,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:html/parser.dart';
 import 'dart:io';
 import '../main.dart';
+import '../model/author.dart';
 import '../model/book.dart';
 import '../model/data.dart';
 import '../providers/booklist_provider.dart';
@@ -80,7 +81,7 @@ class _BookDetailsContentState extends ConsumerState<BookDetailsContent> {
                   detailContent: widget.book!.title),
               bookDetailElement(
                   detailType: '${AppLocalizations.of(context)!.author}: ',
-                  detailContent: widget.book!.authors![0].name),
+                  detailContent: authors(widget.book!.authors!)),
               const SizedBox(
                 height: 8,
               ),
@@ -127,6 +128,16 @@ class _BookDetailsContentState extends ConsumerState<BookDetailsContent> {
             ],
           ),
         ));
+  }
+
+  String authors(List<Author>? authors) {
+    String items = authors![0].name;
+    if (authors.length > 1) {
+      for (var i = 1; i < authors.length; i++) {
+        items = '$items & ${authors[i].name}';
+      }
+    }
+    return items;
   }
 
   Image loadCover() {
