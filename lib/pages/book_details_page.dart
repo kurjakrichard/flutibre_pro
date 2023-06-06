@@ -134,7 +134,7 @@ class _BookDetailsContentState extends ConsumerState<BookDetailsContent> {
     String items = authors![0].name;
     if (authors.length > 1) {
       for (var i = 1; i < authors.length; i++) {
-        items = '$items & ${authors[i].name}';
+        items = '$items, ${authors[i].name}';
       }
     }
     return items;
