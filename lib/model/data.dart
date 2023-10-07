@@ -1,20 +1,22 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, must_be_immutable
 
-class Data {
-  int id;
+import 'package:equatable/equatable.dart';
+
+class Data extends Equatable {
+  int? id;
   int book;
   String format;
   int uncompressed_size;
   String name;
 
-  Data({
-    required this.id,
-    required this.book,
-    required this.format,
-    required this.uncompressed_size,
-    this.name = '',
-  });
+  Data(
+      {this.id,
+      required this.book,
+      required this.format,
+      required this.uncompressed_size,
+      required this.name});
 
+  //Convert a Map object to a model object
   Data.fromMap(Map<String, dynamic> res)
       : id = res['id'],
         book = res['book'],
@@ -22,12 +24,24 @@ class Data {
         uncompressed_size = res['uncompressed_size'],
         name = res['name'];
 
-  Map<String, Object?> toMap() {
-    return {
-      'book': book,
-      'format': format,
-      'uncompressed_size': uncompressed_size,
-      'name': name,
-    };
+  //Convert a model object to a Map opject
+  Map<String, dynamic> toMap() {
+    Map<String, dynamic> map = <String, dynamic>{};
+    if (id != null) {
+      map['id'] = id;
+    }
+    map['book'] = book;
+    map['format'] = format;
+    map['uncompressed_size'] = uncompressed_size;
+    map['name'] = name;
+    return map;
   }
+
+  @override
+  String toString() {
+    return 'Data(id : $id, book : $book, format : $format, uncompressed_size: $uncompressed_size, name: $name)';
+  }
+
+  @override
+  List<Object?> get props => [book, format, uncompressed_size, name];
 }

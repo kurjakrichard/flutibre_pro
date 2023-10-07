@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'providers/authors_provider.dart';
+import 'screens/show_items_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,8 +29,16 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Flutibre'),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => AuthorsProvider())
+      ],
+      builder: (context, child) => MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Flutibre',
+        theme: ThemeData(),
+        home: const ShowItemsScreen(),
+      ),
     );
   }
 }

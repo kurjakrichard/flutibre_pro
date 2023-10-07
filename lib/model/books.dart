@@ -1,7 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 import 'package:equatable/equatable.dart';
-import 'author.dart';
-import 'comment.dart';
+import 'authors.dart';
+import 'comments.dart';
 import 'data.dart';
 
 // ignore: must_be_immutable
@@ -22,8 +22,8 @@ class Books extends Equatable {
   final String last_modified;
   //Related classes
   List<Data>? formats;
-  List<Author>? authors;
-  Comment? comment;
+  List<Authors>? authors;
+  Comments? comment;
 
   Books(
       {this.id,
@@ -76,6 +76,11 @@ class Books extends Equatable {
       'has_cover': has_cover,
       'last_modified': last_modified
     };
+  }
+
+  @override
+  String toString() {
+    return 'Books(id : $id, title : $title, sort : $sort, author_sort : $author_sort)';
   }
 
   @override

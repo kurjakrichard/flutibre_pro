@@ -6,7 +6,7 @@ class BookListItem {
   String author_sort;
   String title;
   String sort;
-  String timestamp;
+  String last_modified;
   int has_cover;
   double series_index;
   String path;
@@ -18,19 +18,20 @@ class BookListItem {
     this.author_sort = '',
     this.title = '',
     this.sort = '',
-    this.timestamp = '',
+    this.last_modified = '',
     this.has_cover = 0,
     this.series_index = 1.0,
     this.path = '',
   });
 
+  //Convert a Map object to a model object
   BookListItem.fromMap(Map<String, dynamic> res)
       : id = res['id'],
         name = res['name'],
         author_sort = res['author_sort'],
         title = res['title'],
         sort = res['sort'],
-        timestamp = res['timestamp'].toString().substring(0, 10),
+        last_modified = res['last_modified'].toString().substring(0, 10),
         has_cover = res['has_cover'],
         series_index = res['series_index'],
         path = res['path'];
