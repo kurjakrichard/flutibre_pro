@@ -3,7 +3,6 @@ import 'package:flutibre/model/database_model.dart';
 import 'package:path/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:path_provider/path_provider.dart';
-
 import '../model/books_authors_link.dart';
 
 class DatabaseHandler {
@@ -26,8 +25,9 @@ class DatabaseHandler {
   Future<Database> initDB() async {
     sqfliteFfiInit();
     final databaseFactory = databaseFactoryFfi;
-    final appDocumentsDir = await getApplicationDocumentsDirectory();
-    final dbPath = join(appDocumentsDir.path, "databases", "$db.db");
+    //final appDocumentsDir = await getApplicationDocumentsDirectory();
+    //final dbPath = join(appDocumentsDir.path, "databases", "$db.db");
+    const dbPath = "/home/sire/Sablonok/Ebooks2/metadata.db";
     final database = await databaseFactory.openDatabase(
       dbPath,
       options: OpenDatabaseOptions(
