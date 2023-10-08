@@ -2,7 +2,9 @@
 
 import 'package:equatable/equatable.dart';
 
-class BooksLanguagesLink extends Equatable {
+import 'database_model.dart';
+
+class BooksLanguagesLink extends Equatable implements DatabaseModel {
   int? id;
   final int book;
   final int lang_code;
@@ -15,6 +17,7 @@ class BooksLanguagesLink extends Equatable {
       required this.item_order});
 
   //Convert a Map object to a model opject
+  @override
   BooksLanguagesLink.fromMap(Map<String, dynamic> res)
       : id = res['id'],
         book = res['book'],
@@ -22,6 +25,7 @@ class BooksLanguagesLink extends Equatable {
         item_order = res['item_order'];
 
   //Convert a model object to a Map opject
+  @override
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = <String, dynamic>{};
     if (id != null) {

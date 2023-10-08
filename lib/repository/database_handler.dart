@@ -1,6 +1,10 @@
+import 'package:flutibre/model/authors.dart';
+import 'package:flutibre/model/database_model.dart';
 import 'package:path/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:path_provider/path_provider.dart';
+
+import '../model/books_authors_link.dart';
 
 class DatabaseHandler {
   static DatabaseHandler? _databaseHandler;
@@ -53,18 +57,42 @@ class DatabaseHandler {
     //return db.rawQuery("SELECT * FROM $todo");
   }
 
+  // Fetch Operation: Get all data from database
+  Future<DatabaseModel> selectItem(String table, String type, int id) async {
+    final db = await database;
+    DatabaseModel? item;
+    List<Map<String, dynamic>> itemMap =
+        await db.query(table, where: 'id = ?', whereArgs: [id], limit: 1);
+
+    switch (type) {
+      case 'Authors':
+        item = Authors.fromMap(itemMap[0]);
+        break;
+      case 'BooksAuthorsLink':
+        item = BooksAuthorsLink.fromMap(itemMap[0]);
+        break;
+
+      default:
+    }
+
+    return item!;
+  }
+
   // Insert Operation: Insert new record to database
-  Future<int> insert(String tableName, dynamic item) async {
+  Future<int> insert(String table, dynamic item) async {
     Database db = await database;
-    var result = await db.insert(tableName, item.toMap());
+    var result = await db.insert(table, item.toMap());
     return result;
   }
 
   // Update Operation: Update record in the database
-  Future<int> update(String tableName, dynamic item) async {
+  Future<int> update(String table, int id, dynamic item) async {
     var db = await database;
-    var result = await db.update(tableName, item.toMap(),
-        where: '$tableName = ?', whereArgs: [item.id]);
+    var result = await db.update(table, item.toMap(),
+        where: 'id = ?',
+        whereArgs: [id],
+        conflictAlgorithm: ConflictAlgorithm.replace);
+
     return result;
   }
 

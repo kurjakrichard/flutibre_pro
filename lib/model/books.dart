@@ -3,9 +3,10 @@ import 'package:equatable/equatable.dart';
 import 'authors.dart';
 import 'comments.dart';
 import 'data.dart';
+import 'database_model.dart';
 
 // ignore: must_be_immutable
-class Books extends Equatable {
+class Books extends Equatable implements DatabaseModel {
   int? id;
   final String title;
   final String sort;
@@ -44,6 +45,8 @@ class Books extends Equatable {
       this.authors,
       this.comment});
 
+  //Convert a Map object to a model object
+  @override
   Books.fromMap(Map<String, dynamic> res)
       : id = res['id'],
         title = res['title'],
@@ -59,7 +62,8 @@ class Books extends Equatable {
         uuid = res['uuid'],
         has_cover = res['has_cover'],
         last_modified = res['last_modified'];
-
+  //Convert a model object to a Map opject
+  @override
   Map<String, Object?> toMap() {
     return {
       'title': title,

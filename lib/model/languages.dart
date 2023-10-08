@@ -2,7 +2,9 @@
 
 import 'package:equatable/equatable.dart';
 
-class Languages extends Equatable {
+import 'database_model.dart';
+
+class Languages extends Equatable implements DatabaseModel {
   int? id;
   final String lang_code;
   String? link;
@@ -10,12 +12,14 @@ class Languages extends Equatable {
   Languages({this.id, required this.lang_code, this.link});
 
   //Convert a Map object to a model opject
+  @override
   Languages.fromMap(Map<String, dynamic> res)
       : id = res['id'],
         lang_code = res['lang_code'],
         link = res['link'];
 
   //Convert a model object to a Map opject
+  @override
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = <String, dynamic>{};
     if (id != null) {

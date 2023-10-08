@@ -1,3 +1,4 @@
+import 'package:flutibre/screens/manage_item_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -15,29 +16,25 @@ class Flutibre extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      initialRoute: '/',
-      routes: {'/': (context) => const HomePage()},
-      debugShowCheckedModeBanner: false,
-      title: 'Flutibre',
-    );
-  }
-}
-
-class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => AuthorsProvider())
       ],
       builder: (context, child) => MaterialApp(
+        initialRoute: '/',
+        routes: {
+          '/': (context) => const ShowItemsScreen(),
+          '/addpage': (context) => const ManageItemScreen(
+                title: 'Add Item',
+                buttonText: 'Insert',
+              ),
+          '/editpage': (context) => const ManageItemScreen(
+                title: 'Edit Item',
+                buttonText: 'Update',
+              )
+        },
         debugShowCheckedModeBanner: false,
         title: 'Flutibre',
-        theme: ThemeData(),
-        home: const ShowItemsScreen(),
       ),
     );
   }

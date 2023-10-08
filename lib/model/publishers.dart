@@ -1,8 +1,8 @@
 // ignore_for_file: must_be_immutable
-
 import 'package:equatable/equatable.dart';
+import 'database_model.dart';
 
-class Publishers extends Equatable {
+class Publishers extends Equatable implements DatabaseModel {
   int? id;
   final String name;
   final String sort;
@@ -11,6 +11,7 @@ class Publishers extends Equatable {
   Publishers({this.id, this.name = '', this.sort = '', this.link = ''});
 
   //Convert a Map object to a model object
+  @override
   Publishers.fromMap(Map<String, dynamic> res)
       : id = res['id'],
         name = res['name'],
@@ -18,6 +19,7 @@ class Publishers extends Equatable {
         link = res['link'];
 
   //Convert a model object to a Map object
+  @override
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = <String, dynamic>{};
     if (id != null) {

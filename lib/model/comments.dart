@@ -2,7 +2,9 @@
 
 import 'package:equatable/equatable.dart';
 
-class Comments extends Equatable {
+import 'database_model.dart';
+
+class Comments extends Equatable implements DatabaseModel {
   int? id;
   final int book;
   final String text;
@@ -10,12 +12,14 @@ class Comments extends Equatable {
   Comments({this.id, required this.book, required this.text});
 
   //Convert a Map object to a model object
+  @override
   Comments.fromMap(Map<String, dynamic> res)
       : id = res['id'],
         book = res['book'],
         text = res['text'];
 
   //Convert a model object to a Map opject
+  @override
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = <String, dynamic>{};
     if (id != null) {

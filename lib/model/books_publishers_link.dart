@@ -2,7 +2,9 @@
 
 import 'package:equatable/equatable.dart';
 
-class BooksPublishersLink extends Equatable {
+import 'database_model.dart';
+
+class BooksPublishersLink extends Equatable implements DatabaseModel {
   int? id;
   final int book;
   final int publisher;
@@ -10,12 +12,14 @@ class BooksPublishersLink extends Equatable {
   BooksPublishersLink({this.id, required this.book, required this.publisher});
 
   //Convert a Map object to a model object
+  @override
   BooksPublishersLink.fromMap(Map<String, dynamic> res)
       : id = res['id'],
         book = res['book'],
         publisher = res['publisher'];
 
   //Convert a model object to a Map opject
+  @override
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = <String, dynamic>{};
     if (id != null) {
