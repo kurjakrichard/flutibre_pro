@@ -1,7 +1,9 @@
+import 'package:flutibre/model/booklist_item.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../model/authors.dart';
-import '../providers/authors_provider.dart';
+import '../model/books.dart';
+import '../providers/booklist_provider.dart';
 
 class ManageItemScreen extends StatefulWidget {
   const ManageItemScreen(
@@ -15,16 +17,16 @@ class ManageItemScreen extends StatefulWidget {
 }
 
 class _ManageItemScreenState extends State<ManageItemScreen> {
-  Authors? selectedAuthor;
-  final TextEditingController _nameController = TextEditingController();
+  Books? selectedItem;
+  final TextEditingController _titleController = TextEditingController();
   final TextEditingController _sortController = TextEditingController();
-  final TextEditingController _linkController = TextEditingController();
+  final TextEditingController _authorController = TextEditingController();
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _titleController.dispose();
     _sortController.dispose();
-    _linkController.dispose();
+    _authorController.dispose();
     super.dispose();
   }
 
@@ -32,24 +34,24 @@ class _ManageItemScreenState extends State<ManageItemScreen> {
   Widget build(BuildContext context) {
     var routeSettings = ModalRoute.of(context)!.settings;
     if (routeSettings.arguments != null) {
-      selectedAuthor = routeSettings.arguments as Authors;
-      _nameController.text = selectedAuthor!.name;
-      _sortController.text = selectedAuthor!.sort;
-      _linkController.text = selectedAuthor!.link;
+      selectedItem = routeSettings.arguments as Books;
+      _titleController.text = selectedItem!.title;
+      _sortController.text = selectedItem!.sort;
+      _authorController.text = selectedItem!.author_sort;
     } else {
-      selectedAuthor = null;
+      selectedItem = null;
     }
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
         actions: [
-          selectedAuthor != null
+          selectedItem != null
               ? IconButton(
                   tooltip: 'Delete book',
                   icon: const Icon(Icons.delete),
                   onPressed: () {
-                    Provider.of<AuthorsProvider>(context, listen: false)
-                        .delete(selectedAuthor!);
+                    Provider.of<BooksProvider>(context, listen: false)
+                        .delete(selectedItem!.id!);
                     Navigator.pop(context);
                   },
                 )
@@ -58,22 +60,25 @@ class _ManageItemScreenState extends State<ManageItemScreen> {
       ),
       body: ListView(
         children: [
-          textController('Name', _nameController),
+          textController('Title', _titleController),
           textController('Sort', _sortController),
-          textController('Link', _linkController),
+          textController('Author', _authorController),
           ElevatedButton(
               onPressed: () {
-                Authors author = Authors(
-                    id: selectedAuthor?.id,
-                    name: _nameController.text,
+                String authorSort = sortingAuthor(_authorController.text);
+                Books book = Books(
+                    id: selectedItem?.id,
+                    title: _titleController.text,
                     sort: _sortController.text,
-                    link: _linkController.text);
-                if (selectedAuthor != null && selectedAuthor != author) {
-                  Provider.of<AuthorsProvider>(context, listen: false)
-                      .update(author, selectedAuthor!.id!);
-                } else if (selectedAuthor == null) {
-                  Provider.of<AuthorsProvider>(context, listen: false)
-                      .insert(author);
+                    author_sort: authorSort);
+                if (selectedItem != null && selectedItem != book) {
+                  Provider.of<BooksProvider>(context, listen: false)
+                      .update(book: book, id: selectedItem!.id!);
+                } else if (selectedItem == null) {
+                  Authors author =
+                      Authors(name: _authorController.text, sort: authorSort);
+                  Provider.of<BooksProvider>(context, listen: false)
+                      .insert(book: book, author: author);
                 }
                 //context.read<TodoProvider>().insertTodo(todo);
                 clerControllers();
@@ -85,10 +90,20 @@ class _ManageItemScreenState extends State<ManageItemScreen> {
     );
   }
 
+  String sortingAuthor(String author) {
+    List<String> authorSplit = author.split(' ');
+    String authorSort = authorSplit[authorSplit.length - 1];
+    authorSplit.removeLast();
+    for (var item in authorSplit) {
+      authorSort = authorSort + ', ' + item;
+    }
+    return authorSort;
+  }
+
   void clerControllers() {
-    _nameController.clear();
+    _titleController.clear();
     _sortController.clear();
-    _linkController.clear();
+    _authorController.clear();
   }
 
   Widget textController(String title, TextEditingController controller) {

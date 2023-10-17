@@ -1,5 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'dart:math';
+
 class BookListItem {
   int id;
   String name;
@@ -31,7 +33,7 @@ class BookListItem {
         author_sort = res['author_sort'],
         title = res['title'],
         sort = res['sort'],
-        last_modified = res['last_modified'].toString().substring(0, 10),
+        last_modified = res['last_modified'].toString(),
         has_cover = res['has_cover'],
         series_index = res['series_index'],
         path = res['path'];

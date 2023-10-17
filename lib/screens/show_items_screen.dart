@@ -1,7 +1,8 @@
 import 'package:flutibre/model/authors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/authors_provider.dart';
+import '../model/books.dart';
+import '../providers/booklist_provider.dart';
 import '../repository/database_handler.dart';
 
 class ShowItemsScreen extends StatefulWidget {
@@ -12,13 +13,13 @@ class ShowItemsScreen extends StatefulWidget {
 }
 
 class _ShowItemsScreenState extends State<ShowItemsScreen> {
-  Authors? selectedAuthor;
+  Books? selectedBook;
 
   @override
   Widget build(BuildContext context) {
     var routeSettings = ModalRoute.of(context)!.settings;
     if (routeSettings.arguments != null) {
-      selectedAuthor = routeSettings.arguments as Authors;
+      selectedBook = routeSettings.arguments as Books;
     }
     return Scaffold(
         appBar: AppBar(title: const Text('Flutibre')),
@@ -29,11 +30,11 @@ class _ShowItemsScreenState extends State<ShowItemsScreen> {
           },
         ),
         body: FutureBuilder(
-            future: Provider.of<AuthorsProvider>(context, listen: false)
-                .selectAll(),
+            future:
+                Provider.of<BooksProvider>(context, listen: false).selectAll(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
-                return Consumer<AuthorsProvider>(
+                return Consumer<BooksProvider>(
                   builder: (context, provider, child) {
                     return provider.items.isNotEmpty
                         ? ListView.builder(
@@ -44,21 +45,21 @@ class _ShowItemsScreenState extends State<ShowItemsScreen> {
                                 child: ListTile(
                                   onTap: () async {
                                     var databaseHandler = DatabaseHandler();
-                                    selectedAuthor =
-                                        await databaseHandler.selectItem(
-                                                'authors',
-                                                'Authors',
-                                                provider.items[index].id!)
-                                            as Authors;
+                                    selectedBook =
+                                        await databaseHandler.selectItemById(
+                                            'books',
+                                            'Books',
+                                            provider.items[index].id) as Books;
                                     if (!context.mounted) return;
                                     Navigator.of(context).pushNamed('/editpage',
-                                        arguments: selectedAuthor);
+                                        arguments: selectedBook);
                                     //provider.delete(provider.items[index]);
                                   },
                                   style: ListTileStyle.drawer,
                                   title: Text(provider.items[index].name),
                                   subtitle: Text(provider.items[index].sort),
-                                  trailing: Text(provider.items[index].link),
+                                  trailing:
+                                      Text(provider.items[index].author_sort),
                                 ),
                               );
                             })

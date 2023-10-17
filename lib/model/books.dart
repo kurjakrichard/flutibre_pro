@@ -18,7 +18,7 @@ class Books extends Equatable implements DatabaseModel {
   final String lccn;
   final String path;
   final int flags;
-  final String uuid;
+  String? uuid;
   final int has_cover;
   final String last_modified;
   //Related classes
@@ -30,17 +30,16 @@ class Books extends Equatable implements DatabaseModel {
       {this.id,
       this.title = '',
       this.sort = '',
-      this.timestamp = '',
-      this.pubdate = '',
+      this.timestamp = '2023-10-10 05:08:14',
+      this.pubdate = '2023-10-10 05:08:14',
       this.series_index = 1.0,
       this.author_sort = '',
       this.isbn = '',
       this.lccn = '',
       this.path = '',
-      this.flags = 0,
-      this.uuid = '',
+      this.flags = 1,
       this.has_cover = 0,
-      this.last_modified = '',
+      this.last_modified = '2023-10-10 05:08:14',
       this.formats,
       this.authors,
       this.comment});
@@ -62,6 +61,7 @@ class Books extends Equatable implements DatabaseModel {
         uuid = res['uuid'],
         has_cover = res['has_cover'],
         last_modified = res['last_modified'];
+
   //Convert a model object to a Map opject
   @override
   Map<String, Object?> toMap() {

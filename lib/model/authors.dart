@@ -8,7 +8,7 @@ class Authors extends Equatable implements DatabaseModel {
   final String sort;
   final String link;
 
-  Authors({this.id, this.name = '', this.sort = '', this.link = ''});
+  Authors({this.id, required this.name, required this.sort, this.link = ''});
 
   //Convert a Map object to a model object
   @override
