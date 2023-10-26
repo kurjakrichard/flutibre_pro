@@ -1,6 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
-
-import 'dart:math';
+import 'package:flutibre/model/authors.dart';
+import 'package:flutibre/model/comments.dart';
+import 'package:flutibre/model/languages.dart';
 
 class BookListItem {
   int id;
@@ -13,7 +14,10 @@ class BookListItem {
   double series_index;
   String path;
   String? fullPath;
-
+  List<Authors>? authors;
+  Comments? comment;
+  List<Languages>? languages;
+  
   BookListItem({
     this.id = 0,
     this.name = '',
