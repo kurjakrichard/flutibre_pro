@@ -1,4 +1,4 @@
-import 'package:flutibre/model/booklist_item.dart';
+import 'package:flutibre/repository/database_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../model/authors.dart';
@@ -65,15 +65,24 @@ class _ManageItemScreenState extends State<ManageItemScreen> {
           textController('Author', _authorController),
           ElevatedButton(
               onPressed: () {
+                DateTime addDateTime = DateTime.now();
                 String authorSort = sortingAuthor(_authorController.text);
                 Books book = Books(
                     id: selectedItem?.id,
                     title: _titleController.text,
+                    last_modified:
+                        '${addDateTime.toString().substring(0, 19)}+00:00',
                     sort: _sortController.text,
-                    author_sort: authorSort);
+                    author_sort: authorSort,
+                    timestamp:
+                        '${addDateTime.toString().substring(0, 19)}+00:00');
                 if (selectedItem != null && selectedItem != book) {
-                  Provider.of<BooksProvider>(context, listen: false)
-                      .update(book: book, id: selectedItem!.id!);
+                  Provider.of<BooksProvider>(context, listen: false).update(
+                      book: book,
+                      author: Authors(
+                          name: 'Brandon Sanderson',
+                          sort: 'Sanderson, Brandon'),
+                      id: selectedItem!.id!);
                 } else if (selectedItem == null) {
                   Authors author =
                       Authors(name: _authorController.text, sort: authorSort);

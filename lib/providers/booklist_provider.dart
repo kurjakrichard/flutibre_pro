@@ -1,4 +1,5 @@
 import 'package:flutibre/model/booklist_item.dart';
+import 'package:flutibre/model/database_model.dart';
 import 'package:flutter/foundation.dart';
 import '../model/authors.dart';
 import '../model/books.dart';
@@ -29,10 +30,21 @@ class BooksProvider extends ChangeNotifier {
           WHERE id=NEW.id; END''',
     );
 
-    int authorId = await databaseHandler.insert(
-      table: 'authors',
-      item: author,
-    );
+    Authors? checkAuthor = await databaseHandler.selectItemByField(
+        table: 'authors',
+        type: 'Authors',
+        field: 'name',
+        searchItem: author.name.toString()) as Authors?;
+
+    bool authorExist = checkAuthor == null;
+    print(authorExist);
+
+    int authorId = authorExist
+        ? await databaseHandler.insert(
+            table: 'authors',
+            item: author,
+          )
+        : checkAuthor.id!;
     await databaseHandler.insert(
       table: 'books_authors_link',
       item: BooksAuthorsLink(book: bookId, author: authorId),
@@ -49,14 +61,40 @@ class BooksProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future update(
-      {String? dropTrigger,
-      Authors? author,
-      required Books book,
-      required int id,
-      String? createTrigger}) async {
+  Future update({
+    required Authors author,
+    required Books book,
+    required int id,
+  }) async {
     var databaseHandler = DatabaseHandler();
-    databaseHandler.update(table: 'books', id: id, item: book);
+    databaseHandler.update(
+        dropTrigger: 'DROP TRIGGER "main"."books_update_trg"',
+        table: 'books',
+        id: id,
+        item: book,
+        createTrigger: '''CREATE TRIGGER books_update_trg AFTER UPDATE ON books 
+            BEGIN UPDATE books SET sort=title_sort(NEW.title) 
+            WHERE id=NEW.id AND OLD.title NEW.title; END''');
+
+    Authors? checkAuthor = await databaseHandler.selectItemByField(
+        table: 'authors',
+        type: 'Authors',
+        field: 'name',
+        searchItem: author.name.toString()) as Authors?;
+
+    bool authorExist = checkAuthor == null;
+    print(authorExist);
+
+    int authorId = authorExist
+        ? await databaseHandler.insert(
+            table: 'authors',
+            item: author,
+          )
+        : checkAuthor.id!;
+    await databaseHandler.insert(
+      table: 'books_authors_link',
+      item: BooksAuthorsLink(book: book.id!, author: authorId),
+    );
 
     selectAll();
     notifyListeners();

@@ -10,7 +10,7 @@ class Books extends Equatable implements DatabaseModel {
   int? id;
   final String title;
   final String sort;
-  final String timestamp;
+  String timestamp;
   final String pubdate;
   final double series_index;
   final String author_sort;
@@ -30,8 +30,8 @@ class Books extends Equatable implements DatabaseModel {
       {this.id,
       this.title = '',
       this.sort = '',
-      this.timestamp = '2023-10-10 05:08:14',
-      this.pubdate = '2023-10-10 05:08:14',
+      this.timestamp = '',
+      this.pubdate = '0101-01-01 00:00:00+00:00',
       this.series_index = 1.0,
       this.author_sort = '',
       this.isbn = '',
@@ -39,7 +39,7 @@ class Books extends Equatable implements DatabaseModel {
       this.path = '',
       this.flags = 1,
       this.has_cover = 0,
-      this.last_modified = '2023-10-10 05:08:14',
+      this.last_modified = '',
       this.formats,
       this.authors,
       this.comment});

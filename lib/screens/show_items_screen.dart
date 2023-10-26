@@ -50,6 +50,7 @@ class _ShowItemsScreenState extends State<ShowItemsScreen> {
                                             'books',
                                             'Books',
                                             provider.items[index].id) as Books;
+
                                     if (!context.mounted) return;
                                     Navigator.of(context).pushNamed('/editpage',
                                         arguments: selectedBook);
