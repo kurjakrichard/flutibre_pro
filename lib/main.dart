@@ -1,4 +1,5 @@
 import 'package:flutibre/screens/manage_item_screen.dart';
+import 'package:flutibre/widgets/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/booklist_provider.dart';
@@ -18,6 +19,7 @@ class Flutibre extends StatelessWidget {
     return MultiProvider(
       providers: [ChangeNotifierProvider(create: (context) => BooksProvider())],
       builder: (context, child) => MaterialApp(
+        theme: baseTheme,
         initialRoute: '/',
         routes: {
           '/': (context) => const ShowItemsScreen(),

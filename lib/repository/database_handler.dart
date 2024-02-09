@@ -5,11 +5,9 @@ import 'package:flutibre/model/data.dart';
 import 'package:flutibre/model/database_model.dart';
 import 'package:flutibre/model/identifiers.dart';
 import 'package:flutibre/model/languages.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:path_provider/path_provider.dart';
 import '../model/booklist_item.dart';
 import '../model/books.dart';
 import '../model/books_authors_link.dart';
@@ -55,15 +53,12 @@ class DatabaseHandler {
 // Get Booklist from database
   Future<List<BookListItem>> getBookItemList() async {
     final db = await database;
-    var resultSet = await db.rawQuery('SELECT COUNT(*) FROM books');
-    int? count = resultSet.length;
+    var resultSet = await db.rawQuery(
+        'SELECT DISTINCT books.id, (SELECT group_concat(name) from authors INNER JOIN books_authors_link on authors.id = books_authors_link.author WHERE book = books.id) as name, author_sort, title, books.sort, series_index, timestamp, has_cover, path from books INNER JOIN books_authors_link on books.id = books_authors_link.book INNER JOIN authors on books_authors_link.author = authors.id ORDER BY books.sort');
 
     List<BookListItem> bookListItems = <BookListItem>[];
 
-    if (count != 0) {
-      var resultSet = await db.rawQuery(
-          'SELECT DISTINCT books.id, (SELECT group_concat(name) from authors INNER JOIN books_authors_link on authors.id = books_authors_link.author WHERE book = books.id) as name, author_sort, title, books.sort, series_index, timestamp, has_cover, path from books INNER JOIN books_authors_link on books.id = books_authors_link.book INNER JOIN authors on books_authors_link.author = authors.id ORDER BY books.sort');
-
+    if (resultSet.isNotEmpty) {
       for (var item in resultSet) {
         BookListItem bookListItem = BookListItem.fromMap(item);
         bookListItems.add(bookListItem);
@@ -73,26 +68,16 @@ class DatabaseHandler {
     return bookListItems;
   }
 
-  // Fetch Operation: Get all data from database
-  Future<List<Map<String, dynamic>>> selectAll(String table) async {
-    final db = await database;
-    return db.query(table);
-    //return db.rawQuery("SELECT * FROM $todo");
-  }
-
   // Fetch Operation: Get item from database by id
   Future<DatabaseModel?> selectItemById(
       String table, String type, int id) async {
     final db = await database;
     DatabaseModel? item;
-
     List<Map<String, dynamic>> itemMap =
         await db.query(table, where: 'id = ?', whereArgs: [id], limit: 1);
-
     if (itemMap.isEmpty) {
       return null;
     }
-
     for (var element in itemMap) {
       switch (type) {
         case 'Authors':
@@ -138,18 +123,26 @@ class DatabaseHandler {
     return item;
   }
 
-  // Fetch Operation: Get item from database by id
+  // Fetch Operation: Get item from database by linktable and bookid
   Future<List<DatabaseModel?>> selectItemByLink(
       {required String table,
+      required String linkTable,
       required String type,
       required String field,
-      required String searchItem}) async {
+      required int bookId}) async {
     final db = await database;
     DatabaseModel? item;
+
     var items = [];
-    List<Map<String, dynamic>> itemMap =
-        await db.query(table, where: '$field = ?', whereArgs: [searchItem]);
-    print(itemMap.length);
+    List<Map<String, dynamic>> itemMap = await db.query(
+      '''
+      SELECT *
+      FROM $table
+      INNER JOIN $linkTable ON $table.id = $linkTable.$table
+      WHERE book = $bookId 
+    ''',
+    );
+
     if (itemMap.isEmpty) {
       return [];
     }
@@ -203,28 +196,64 @@ class DatabaseHandler {
 
   // Fetch Operation: Get item from database by id
   //TODO
-  Future<DatabaseModel> selectItemsByField(
-      String table, String type, String field, String searchItem) async {
+  Future<List<DatabaseModel>> selectItemsByField(
+      {required String table,
+      required String type,
+      required String field,
+      required String searchItem}) async {
     final db = await database;
     DatabaseModel? item;
+    List<DatabaseModel> items = [];
     List<Map<String, dynamic>> itemMap = await db.query(table,
         where: '$field = ?', whereArgs: [searchItem], limit: 1);
 
-    switch (type) {
-      case 'Books':
-        item = Books.fromMap(itemMap[0]);
-        break;
-      case 'BooksAuthorsLink':
-        item = BooksAuthorsLink.fromMap(itemMap[0]);
-        break;
-      case 'Authors':
-        item = Authors.fromMap(itemMap[0]);
-        break;
-      default:
-        item = null;
+    if (itemMap.isEmpty) {
+      return [];
     }
-
-    return item!;
+    for (var element in itemMap) {
+      switch (type) {
+        case 'Authors':
+          item = Authors.fromMap(element);
+          break;
+        case 'BooksAuthorsLink':
+          item = BooksAuthorsLink.fromMap(element);
+          break;
+        case 'BooksLanguagesLink':
+          item = BooksLanguagesLink.fromMap(element);
+          break;
+        case 'BooksPublishersLink':
+          item = BooksPublishersLink.fromMap(element);
+          break;
+        case 'BooksRatingsLink':
+          item = BooksRatingsLink.fromMap(element);
+          break;
+        case 'BooksSeriesLink':
+          item = BooksSeriesLink.fromMap(element);
+          break;
+        case 'BooksTagsLink':
+          item = BooksTagsLink.fromMap(element);
+          break;
+        case 'Books':
+          item = Books.fromMap(element);
+          break;
+        case 'Comments':
+          item = Comments.fromMap(element);
+          break;
+        case 'Data':
+          item = Data.fromMap(element);
+          break;
+        case 'Identifiers':
+          item = Identifiers.fromMap(element);
+          break;
+        case 'Languages':
+          item = Languages.fromMap(element);
+          break;
+        default:
+          item = null;
+      }
+      items.add(item!);
+    }
+    return items;
   }
 
   // Insert Operation: Insert new record to database
@@ -502,7 +531,7 @@ CREATE TABLE IF NOT EXISTS 'annotations_fts_stemmed_docsize'(id INTEGER PRIMARY 
 CREATE TABLE IF NOT EXISTS 'annotations_fts_stemmed_config'(k PRIMARY KEY, v) WITHOUT ROWID;
 INSERT INTO annotations_fts_stemmed_config VALUES('version',4);
 DELETE FROM sqlite_sequence;
-INSERT INTO sqlite_sequence VALUES('books',29);
+INSERT INTO sqlite_sequence VALUES('books',0);
 CREATE TRIGGER annotations_fts_insert_trg AFTER INSERT ON annotations 
 BEGIN
     INSERT INTO annotations_fts(rowid, searchable_text) VALUES (NEW.id, NEW.searchable_text);

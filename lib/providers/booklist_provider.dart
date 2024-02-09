@@ -30,22 +30,22 @@ class BooksProvider extends ChangeNotifier {
           WHERE id=NEW.id; END''',
     );
 
-    List<Authors>? checkAuthors = (await databaseHandler.selectItemByLink(
-            table: 'authors',
-            type: 'Authors',
-            field: 'name',
-            searchItem: author.name.toString()))
-        .cast<Authors>();
+    List<DatabaseModel> checkAuthors =
+        (await databaseHandler.selectItemsByField(
+                table: 'authors',
+                type: 'Authors',
+                field: 'name',
+                searchItem: author.name))
+            .cast<Authors>();
 
     bool authorExist = checkAuthors.isEmpty;
-    print(authorExist);
 
     int authorId = authorExist
         ? await databaseHandler.insert(
             table: 'authors',
             item: author,
           )
-        : checkAuthors[0].id!;
+        : author.id!;
     await databaseHandler.insert(
       table: 'books_authors_link',
       item: BooksAuthorsLink(book: bookId, author: authorId),
@@ -81,10 +81,10 @@ class BooksProvider extends ChangeNotifier {
         table: 'authors',
         type: 'Authors',
         field: 'name',
-        searchItem: author.name.toString()) as Authors?;
+        linkTable: 'books_authors_link',
+        bookId: book.id!) as Authors?;
 
     bool authorExist = checkAuthor == null;
-    print(authorExist);
 
     int authorId = authorExist
         ? await databaseHandler.insert(

@@ -1,5 +1,6 @@
 // ignore_for_file: non_constant_identifier_names
 import 'package:equatable/equatable.dart';
+import 'package:flutibre/model/languages.dart';
 import 'authors.dart';
 import 'comments.dart';
 import 'data.dart';
@@ -22,9 +23,11 @@ class Books extends Equatable implements DatabaseModel {
   final int has_cover;
   final String last_modified;
   //Related classes
+  Comments? comment;
   List<Data>? formats;
   List<Authors>? authors;
-  Comments? comment;
+  List<Languages>? languages;
+  List<Data>? datas;
 
   Books(
       {this.id,

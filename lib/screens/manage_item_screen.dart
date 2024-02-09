@@ -1,4 +1,3 @@
-import 'package:flutibre/repository/database_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../model/authors.dart';
@@ -19,14 +18,14 @@ class ManageItemScreen extends StatefulWidget {
 class _ManageItemScreenState extends State<ManageItemScreen> {
   Books? selectedItem;
   final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _sortController = TextEditingController();
   final TextEditingController _authorController = TextEditingController();
+  final TextEditingController _commentController = TextEditingController();
 
   @override
   void dispose() {
     _titleController.dispose();
-    _sortController.dispose();
     _authorController.dispose();
+    _commentController.dispose();
     super.dispose();
   }
 
@@ -35,9 +34,9 @@ class _ManageItemScreenState extends State<ManageItemScreen> {
     var routeSettings = ModalRoute.of(context)!.settings;
     if (routeSettings.arguments != null) {
       selectedItem = routeSettings.arguments as Books;
-      _titleController.text = selectedItem!.title;
-      _sortController.text = selectedItem!.sort;
-      _authorController.text = selectedItem!.author_sort;
+      _titleController.text = selectedItem?.title ?? '';
+      _authorController.text = selectedItem?.sort ?? '';
+      _commentController.text = selectedItem?.author_sort ?? '';
     } else {
       selectedItem = null;
     }
@@ -61,18 +60,19 @@ class _ManageItemScreenState extends State<ManageItemScreen> {
       body: ListView(
         children: [
           textController('Title', _titleController),
-          textController('Sort', _sortController),
-          textController('Author', _authorController),
+          textController('Sort', _authorController),
+          textController('Author', _commentController),
           ElevatedButton(
               onPressed: () {
                 DateTime addDateTime = DateTime.now();
-                String authorSort = sortingAuthor(_authorController.text);
+                String authorSort = sortingAuthor(_commentController.text);
+
                 Books book = Books(
                     id: selectedItem?.id,
                     title: _titleController.text,
                     last_modified:
                         '${addDateTime.toString().substring(0, 19)}+00:00',
-                    sort: _sortController.text,
+                    sort: _authorController.text,
                     author_sort: authorSort,
                     timestamp:
                         '${addDateTime.toString().substring(0, 19)}+00:00');
@@ -85,7 +85,7 @@ class _ManageItemScreenState extends State<ManageItemScreen> {
                       id: selectedItem!.id!);
                 } else if (selectedItem == null) {
                   Authors author =
-                      Authors(name: _authorController.text, sort: authorSort);
+                      Authors(name: _commentController.text, sort: authorSort);
                   Provider.of<BooksProvider>(context, listen: false)
                       .insert(book: book, author: author);
                 }
@@ -104,15 +104,15 @@ class _ManageItemScreenState extends State<ManageItemScreen> {
     String authorSort = authorSplit[authorSplit.length - 1];
     authorSplit.removeLast();
     for (var item in authorSplit) {
-      authorSort = authorSort + ', ' + item;
+      authorSort = '$authorSort, $item';
     }
     return authorSort;
   }
 
   void clerControllers() {
     _titleController.clear();
-    _sortController.clear();
     _authorController.clear();
+    _commentController.clear();
   }
 
   Widget textController(String title, TextEditingController controller) {

@@ -1,4 +1,3 @@
-import 'package:flutibre/model/authors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../model/books.dart';
@@ -24,6 +23,7 @@ class _ShowItemsScreenState extends State<ShowItemsScreen> {
     return Scaffold(
         appBar: AppBar(title: const Text('Flutibre')),
         floatingActionButton: FloatingActionButton(
+          shape: const CircleBorder(),
           child: const Icon(Icons.add),
           onPressed: () {
             Navigator.of(context).pushNamed('/addpage');
