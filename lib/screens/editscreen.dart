@@ -1,22 +1,22 @@
+import 'package:flutibre/model/booklist_item.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../model/authors.dart';
 import '../model/books.dart';
 import '../providers/booklist_provider.dart';
 
-class ManageItemScreen extends StatefulWidget {
-  const ManageItemScreen(
-      {Key? key, required this.title, required this.buttonText})
+class EditScreen extends StatefulWidget {
+  const EditScreen({Key? key, required this.title, required this.buttonText})
       : super(key: key);
   final String title;
   final String buttonText;
 
   @override
-  State<ManageItemScreen> createState() => _ManageItemScreenState();
+  State<EditScreen> createState() => _EditScreenState();
 }
 
-class _ManageItemScreenState extends State<ManageItemScreen> {
-  Books? selectedItem;
+class _EditScreenState extends State<EditScreen> {
+  BookListItem? oldBook;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _authorController = TextEditingController();
   final TextEditingController _commentController = TextEditingController();
@@ -33,24 +33,24 @@ class _ManageItemScreenState extends State<ManageItemScreen> {
   Widget build(BuildContext context) {
     var routeSettings = ModalRoute.of(context)!.settings;
     if (routeSettings.arguments != null) {
-      selectedItem = routeSettings.arguments as Books;
-      _titleController.text = selectedItem?.title ?? '';
-      _authorController.text = selectedItem?.sort ?? '';
-      _commentController.text = selectedItem?.author_sort ?? '';
+      oldBook = routeSettings.arguments as BookListItem;
+      _titleController.text = oldBook?.title ?? '';
+      _authorController.text = oldBook?.authors ?? '';
+      _commentController.text = oldBook?.comments ?? '';
     } else {
-      selectedItem = null;
+      oldBook = null;
     }
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
         actions: [
-          selectedItem != null
+          oldBook != null
               ? IconButton(
                   tooltip: 'Delete book',
                   icon: const Icon(Icons.delete),
                   onPressed: () {
-                    Provider.of<BooksProvider>(context, listen: false)
-                        .delete(selectedItem!.id!);
+                    Provider.of<BooksListProvider>(context, listen: false)
+                        .delete(oldBook!.id);
                     Navigator.pop(context);
                   },
                 )
@@ -60,35 +60,43 @@ class _ManageItemScreenState extends State<ManageItemScreen> {
       body: ListView(
         children: [
           textController('Title', _titleController),
-          textController('Sort', _authorController),
-          textController('Author', _commentController),
+          textController('Author', _authorController),
+          textController('Comment', _commentController),
           ElevatedButton(
               onPressed: () {
                 DateTime addDateTime = DateTime.now();
                 String authorSort = sortingAuthor(_commentController.text);
-
-                Books book = Books(
-                    id: selectedItem?.id,
+                BookListItem newBook = BookListItem(
+                    id: oldBook!.id,
                     title: _titleController.text,
+                    authors: _authorController.text,
                     last_modified:
                         '${addDateTime.toString().substring(0, 19)}+00:00',
-                    sort: _authorController.text,
+                    sort: _titleController.text,
                     author_sort: authorSort,
                     timestamp:
                         '${addDateTime.toString().substring(0, 19)}+00:00');
-                if (selectedItem != null && selectedItem != book) {
-                  Provider.of<BooksProvider>(context, listen: false).update(
-                      book: book,
+                newBook.title = _titleController.text;
+                newBook.authors = _authorController.text;
+                newBook.comments = _commentController.text;
+                print('OldBook: $oldBook');
+                print('NewBook: $newBook');
+                print(oldBook == newBook);
+                if (oldBook != null && oldBook != newBook) {
+                  print('eltér');
+                  /*   Provider.of<BooksListProvider>(context, listen: false).update(
+                      book: newBook,
                       author: Authors(
                           name: 'Brandon Sanderson',
                           sort: 'Sanderson, Brandon'),
-                      id: selectedItem!.id!);
-                } else if (selectedItem == null) {
-                  Authors author =
-                      Authors(name: _commentController.text, sort: authorSort);
-                  Provider.of<BooksProvider>(context, listen: false)
-                      .insert(book: book, author: author);
+                      id: oldBook!.id)*/
+                  ;
+                } else if (oldBook == null) {
+                  /* Authors author = Authors(name: _commentController.text, sort: authorSort);
+                  Provider.of<BooksListProvider>(context, listen: false)
+                      .insert(book: newBook, author: author);*/
                 }
+
                 //context.read<TodoProvider>().insertTodo(todo);
                 clerControllers();
                 Navigator.pop(context);

@@ -7,7 +7,7 @@ import '../model/books_authors_link.dart';
 import '../model/comments.dart';
 import '../repository/database_handler.dart';
 
-class BooksProvider extends ChangeNotifier {
+class BooksListProvider extends ChangeNotifier {
   List<BookListItem> items = [];
 
   Future<void> selectAll() async {
@@ -20,6 +20,8 @@ class BooksProvider extends ChangeNotifier {
   Future insert(
       {required Books book, required Authors author, Comments? comment}) async {
     var databaseHandler = DatabaseHandler();
+    Authors item = Authors(name: 'Kurjak', sort: 'Kurjak');
+    databaseHandler.insert(table: 'authors', item: item);
 
     int bookId = await databaseHandler.insert(
       dropTrigger: 'DROP TRIGGER books_insert_trg',

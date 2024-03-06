@@ -1,24 +1,23 @@
+import 'package:flutibre/model/booklist_item.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../model/books.dart';
 import '../providers/booklist_provider.dart';
-import '../repository/database_handler.dart';
 
-class ShowItemsScreen extends StatefulWidget {
-  const ShowItemsScreen({Key? key}) : super(key: key);
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
-  State<ShowItemsScreen> createState() => _ShowItemsScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _ShowItemsScreenState extends State<ShowItemsScreen> {
-  Books? selectedBook;
+class _HomeScreenState extends State<HomeScreen> {
+  BookListItem? selectedBook;
 
   @override
   Widget build(BuildContext context) {
     var routeSettings = ModalRoute.of(context)!.settings;
     if (routeSettings.arguments != null) {
-      selectedBook = routeSettings.arguments as Books;
+      selectedBook = routeSettings.arguments as BookListItem;
     }
     return Scaffold(
         appBar: AppBar(title: const Text('Flutibre')),
@@ -30,11 +29,11 @@ class _ShowItemsScreenState extends State<ShowItemsScreen> {
           },
         ),
         body: FutureBuilder(
-            future:
-                Provider.of<BooksProvider>(context, listen: false).selectAll(),
+            future: Provider.of<BooksListProvider>(context, listen: false)
+                .selectAll(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
-                return Consumer<BooksProvider>(
+                return Consumer<BooksListProvider>(
                   builder: (context, provider, child) {
                     return provider.items.isNotEmpty
                         ? ListView.builder(
@@ -44,12 +43,7 @@ class _ShowItemsScreenState extends State<ShowItemsScreen> {
                                 elevation: 5,
                                 child: ListTile(
                                   onTap: () async {
-                                    var databaseHandler = DatabaseHandler();
-                                    selectedBook =
-                                        await databaseHandler.selectItemById(
-                                            'books',
-                                            'Books',
-                                            provider.items[index].id) as Books;
+                                    selectedBook = provider.items[index];
 
                                     if (!context.mounted) return;
                                     Navigator.of(context).pushNamed('/editpage',
@@ -57,10 +51,10 @@ class _ShowItemsScreenState extends State<ShowItemsScreen> {
                                     //provider.delete(provider.items[index]);
                                   },
                                   style: ListTileStyle.drawer,
-                                  title: Text(provider.items[index].name),
-                                  subtitle: Text(provider.items[index].sort),
+                                  title: Text(provider.items[index].authors),
+                                  subtitle: Text(provider.items[index].title),
                                   trailing:
-                                      Text(provider.items[index].author_sort),
+                                      Text(provider.items[index].series ?? ''),
                                 ),
                               );
                             })

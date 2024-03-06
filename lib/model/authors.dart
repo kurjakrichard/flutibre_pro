@@ -22,9 +22,9 @@ class Authors extends Equatable implements DatabaseModel {
   @override
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = <String, dynamic>{};
-    /* if (id != null) {
+    if (id != null) {
       map['id'] = id;
-    }*/
+    }
     map['name'] = name;
     map['sort'] = sort;
     map['link'] = link;

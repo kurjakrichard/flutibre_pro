@@ -39,7 +39,7 @@ class DatabaseHandler {
     final databaseFactory = databaseFactoryFfi;
     //final appDocumentsDir = await getApplicationDocumentsDirectory();
     //final dbPath = join(appDocumentsDir.path, "databases", "$db.db");
-    const dbPath = "/home/sire/Sablonok/Ebooks3/metadata.db";
+    const dbPath = "/home/sire/Sablonok/Ebooks2/metadata.db";
     final database = await databaseFactory.openDatabase(
       dbPath,
       options: OpenDatabaseOptions(
@@ -54,7 +54,17 @@ class DatabaseHandler {
   Future<List<BookListItem>> getBookItemList() async {
     final db = await database;
     var resultSet = await db.rawQuery(
-        'SELECT DISTINCT books.id, (SELECT group_concat(name) from authors INNER JOIN books_authors_link on authors.id = books_authors_link.author WHERE book = books.id) as name, author_sort, title, books.sort, series_index, timestamp, has_cover, path from books INNER JOIN books_authors_link on books.id = books_authors_link.book INNER JOIN authors on books_authors_link.author = authors.id ORDER BY books.sort');
+        ''' SELECT id, title, (SELECT group_concat(name, ' & ') FROM books_authors_link AS bal JOIN authors ON(author = authors.id) WHERE book = books.id) authors, 
+        (SELECT name FROM publishers WHERE publishers.id IN (SELECT publisher from books_publishers_link WHERE book=books.id)) publisher, 
+        (SELECT rating FROM ratings WHERE ratings.id IN (SELECT rating from books_ratings_link WHERE book=books.id)) rating, 
+        timestamp, 
+        (SELECT MAX(uncompressed_size) FROM data WHERE book=books.id) size, 
+        (SELECT group_concat(name, ', ') FROM tags WHERE tags.id IN (SELECT tag from books_tags_link WHERE book=books.id)) tags, 
+        (SELECT text FROM comments WHERE book=books.id) comments, 
+        (SELECT group_concat(languages.lang_code, ', ' )  FROM books_languages_link JOIN languages ON books_languages_link.lang_code = languages.id WHERE book = books.id) languages,
+        (SELECT name FROM series WHERE series.id IN (SELECT series FROM books_series_link WHERE book=books.id)) series, 
+        series_index, sort, author_sort, (SELECT group_concat(format, ', ') FROM data WHERE data.book=books.id) formats, 
+        isbn, path, lccn, pubdate, flags, uuid, has_cover FROM books''');
 
     List<BookListItem> bookListItems = <BookListItem>[];
 
@@ -65,6 +75,7 @@ class DatabaseHandler {
       }
       return bookListItems;
     }
+
     return bookListItems;
   }
 

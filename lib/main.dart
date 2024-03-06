@@ -1,12 +1,16 @@
-import 'package:flutibre/screens/manage_item_screen.dart';
+import 'package:flutibre/firstrun_wizard/wizard.dart';
+import 'package:flutibre/screens/editscreen.dart';
 import 'package:flutibre/widgets/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'providers/booklist_provider.dart';
-import 'screens/show_items_screen.dart';
+import 'screens/homescreen.dart';
 
-void main() {
+late SharedPreferences prefs;
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  prefs = await SharedPreferences.getInstance();
 
   runApp(const Flutibre());
 }
@@ -17,17 +21,19 @@ class Flutibre extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [ChangeNotifierProvider(create: (context) => BooksProvider())],
+      providers: [
+        ChangeNotifierProvider(create: (context) => BooksListProvider())
+      ],
       builder: (context, child) => MaterialApp(
         theme: baseTheme,
         initialRoute: '/',
         routes: {
-          '/': (context) => const ShowItemsScreen(),
-          '/addpage': (context) => const ManageItemScreen(
+          '/': (context) => const HomeScreen(),
+          '/addpage': (context) => const EditScreen(
                 title: 'Add Item',
                 buttonText: 'Insert',
               ),
-          '/editpage': (context) => const ManageItemScreen(
+          '/editpage': (context) => const EditScreen(
                 title: 'Edit Item',
                 buttonText: 'Update',
               )
