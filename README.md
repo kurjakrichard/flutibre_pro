@@ -4,7 +4,7 @@ Calibre clone for touchscreen devices.
 
 Privacy policy
 1. General provisions
-1.1 Futibre application is developed by Richard Kurjak.
+1.1 Flutibre application is developed by Richard Kurjak.
 
 1.2 The application does not require the user to provide any personal or confidential information and does not collect it during the use of the application.
 
