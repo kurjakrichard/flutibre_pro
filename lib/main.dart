@@ -1,4 +1,3 @@
-import 'package:flutibre/firstrun_wizard/wizard.dart';
 import 'package:flutibre/screens/editscreen.dart';
 import 'package:flutibre/widgets/theme.dart';
 import 'package:flutter/material.dart';

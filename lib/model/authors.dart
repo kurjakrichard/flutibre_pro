@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutibre/model/database_model.dart';
 
 class Authors extends Equatable implements DatabaseModel {
+  @override
   int? id;
   final String name;
   final String sort;

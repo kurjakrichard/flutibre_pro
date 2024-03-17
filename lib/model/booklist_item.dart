@@ -19,9 +19,11 @@ class BookListItem extends Equatable {
   String formats;
   String isbn;
   String path;
+  String filename;
   String lccn;
   String pubdate;
   String last_modified;
+  String uuid;
   int has_cover;
 
   BookListItem({
@@ -41,9 +43,11 @@ class BookListItem extends Equatable {
     this.formats = '',
     this.isbn = '',
     this.path = '',
+    this.filename = '',
     this.lccn = '',
     this.pubdate = '',
     this.last_modified = '',
+    this.uuid = '',
     this.has_cover = 0,
   });
   //Convert a Map object to a model object
@@ -61,12 +65,14 @@ class BookListItem extends Equatable {
         series_index = res['series_index'],
         sort = res['sort'],
         author_sort = res['author_sort'],
-        formats = res['formats'] ?? '',
+        formats = res['formats'].toString().toLowerCase(),
         isbn = res['isbn'],
         path = res['path'],
+        filename = res['filename'] ?? '',
         lccn = res['lccn'],
         pubdate = res['pubdate'],
-        last_modified = res['last_modified'].toString(),
+        last_modified = res['last_modified'],
+        uuid = res['uuid'] ?? '',
         has_cover = res['has_cover'] ?? 0;
 
   @override
@@ -92,9 +98,11 @@ class BookListItem extends Equatable {
         formats,
         isbn,
         path,
+        filename,
         lccn,
         pubdate,
         last_modified,
+        uuid,
         has_cover
       ];
 }

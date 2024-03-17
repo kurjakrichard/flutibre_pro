@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'database_model.dart';
 
 class Publishers extends Equatable implements DatabaseModel {
+  @override
   int? id;
   final String name;
   final String sort;

@@ -20,8 +20,8 @@ class BooksListProvider extends ChangeNotifier {
   Future insert(
       {required Books book, required Authors author, Comments? comment}) async {
     var databaseHandler = DatabaseHandler();
-    Authors item = Authors(name: 'Kurjak', sort: 'Kurjak');
-    databaseHandler.insert(table: 'authors', item: item);
+    //Authors item = Authors(name: author.name, sort: author.name);
+    //databaseHandler.insert(table: 'authors', item: item);
 
     int bookId = await databaseHandler.insert(
       dropTrigger: 'DROP TRIGGER books_insert_trg',
@@ -47,7 +47,7 @@ class BooksListProvider extends ChangeNotifier {
             table: 'authors',
             item: author,
           )
-        : author.id!;
+        : checkAuthors[0].id;
     await databaseHandler.insert(
       table: 'books_authors_link',
       item: BooksAuthorsLink(book: bookId, author: authorId),

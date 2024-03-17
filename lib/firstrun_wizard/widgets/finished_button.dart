@@ -17,8 +17,8 @@ class FinishedButton extends StatelessWidget {
         }
         final enabled = snapshot.data!;
         return ElevatedButton(
-          child: const Text("Finish"),
           onPressed: enabled ? _onPressed : null,
+          child: const Text("Finish"),
         );
       },
     );

@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'database_model.dart';
 
 class Tags extends Equatable implements DatabaseModel {
+  @override
   int? id;
   final int name;
   final String link;

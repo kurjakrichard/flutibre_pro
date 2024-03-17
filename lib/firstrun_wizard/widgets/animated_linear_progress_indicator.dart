@@ -13,11 +13,11 @@ class AnimatedLinearProgressIndicator extends StatefulWidget {
   final double value;
 
   @override
-  _AnimatedLinearProgressIndicatorState createState() =>
-      _AnimatedLinearProgressIndicatorState();
+  AnimatedLinearProgressIndicatorState createState() =>
+      AnimatedLinearProgressIndicatorState();
 }
 
-class _AnimatedLinearProgressIndicatorState
+class AnimatedLinearProgressIndicatorState
     extends State<AnimatedLinearProgressIndicator>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;

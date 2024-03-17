@@ -1,10 +1,9 @@
 // ignore_for_file: must_be_immutable
-
 import 'package:equatable/equatable.dart';
-
 import 'database_model.dart';
 
 class Ratings extends Equatable implements DatabaseModel {
+  @override
   int? id;
   final int rating;
   final String link;

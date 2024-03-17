@@ -50,21 +50,22 @@ class DatabaseHandler {
     return database;
   }
 
-// Get Booklist from database
+  // Get Booklist from database
   Future<List<BookListItem>> getBookItemList() async {
     final db = await database;
-    var resultSet = await db.rawQuery(
-        ''' SELECT id, title, (SELECT group_concat(name, ' & ') FROM books_authors_link AS bal JOIN authors ON(author = authors.id) WHERE book = books.id) authors, 
+    var resultSet = await db.rawQuery(''' SELECT id, title, 
+        (SELECT group_concat(name, ' & ') FROM books_authors_link AS bal JOIN authors ON(author = authors.id) WHERE book = books.id) authors, 
         (SELECT name FROM publishers WHERE publishers.id IN (SELECT publisher from books_publishers_link WHERE book=books.id)) publisher, 
         (SELECT rating FROM ratings WHERE ratings.id IN (SELECT rating from books_ratings_link WHERE book=books.id)) rating, 
         timestamp, 
         (SELECT MAX(uncompressed_size) FROM data WHERE book=books.id) size, 
         (SELECT group_concat(name, ', ') FROM tags WHERE tags.id IN (SELECT tag from books_tags_link WHERE book=books.id)) tags, 
-        (SELECT text FROM comments WHERE book=books.id) comments, 
+        (SELECT text FROM comments WHERE book=books.id) comments,
+        (SELECT DISTINCT(name) FROM data WHERE book=books.id) filename, 
         (SELECT group_concat(languages.lang_code, ', ' )  FROM books_languages_link JOIN languages ON books_languages_link.lang_code = languages.id WHERE book = books.id) languages,
         (SELECT name FROM series WHERE series.id IN (SELECT series FROM books_series_link WHERE book=books.id)) series, 
         series_index, sort, author_sort, (SELECT group_concat(format, ', ') FROM data WHERE data.book=books.id) formats, 
-        isbn, path, lccn, pubdate, flags, uuid, has_cover FROM books''');
+        isbn, path, lccn, pubdate, flags, uuid, last_modified, has_cover FROM books''');
 
     List<BookListItem> bookListItems = <BookListItem>[];
 
@@ -77,6 +78,35 @@ class DatabaseHandler {
     }
 
     return bookListItems;
+  }
+
+// Get Booklist from database
+  Future<BookListItem> getBookItemByID(int id) async {
+    final db = await database;
+    var resultSet = await db.rawQuery(
+        ''' SELECT id, title, (SELECT group_concat(name, ' & ') FROM books_authors_link AS bal JOIN authors ON(author = authors.id) WHERE book = books.id) authors, 
+        (SELECT name FROM publishers WHERE publishers.id IN (SELECT publisher from books_publishers_link WHERE book=books.id)) publisher, 
+        (SELECT rating FROM ratings WHERE ratings.id IN (SELECT rating from books_ratings_link WHERE book=books.id)) rating, 
+        timestamp, 
+        (SELECT MAX(uncompressed_size) FROM data WHERE book=books.id) size, 
+        (SELECT group_concat(name, ', ') FROM tags WHERE tags.id IN (SELECT tag from books_tags_link WHERE book=books.id)) tags, 
+        (SELECT text FROM comments WHERE book=books.id) comments, 
+        (SELECT group_concat(languages.lang_code, ', ' )  FROM books_languages_link JOIN languages ON books_languages_link.lang_code = languages.id WHERE book = books.id) languages,
+        (SELECT name FROM series WHERE series.id IN (SELECT series FROM books_series_link WHERE book=books.id)) series, 
+        series_index, sort, author_sort, (SELECT group_concat(format, ', ') FROM data WHERE data.book=books.id) formats, 
+        isbn, path, lccn, pubdate, flags, uuid, has_cover FROM books WHERE id = ? ''',
+        [id]);
+
+    List<BookListItem> bookListItems = <BookListItem>[];
+
+    if (resultSet.isNotEmpty) {
+      BookListItem bookListItem = BookListItem.fromMap(resultSet[0]);
+      bookListItems.add(bookListItem);
+
+      return bookListItem;
+    }
+
+    return BookListItem();
   }
 
   // Fetch Operation: Get item from database by id

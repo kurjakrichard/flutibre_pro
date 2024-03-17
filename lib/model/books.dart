@@ -8,6 +8,7 @@ import 'database_model.dart';
 
 // ignore: must_be_immutable
 class Books extends Equatable implements DatabaseModel {
+  @override
   int? id;
   final String title;
   final String sort;
@@ -19,7 +20,7 @@ class Books extends Equatable implements DatabaseModel {
   final String lccn;
   final String path;
   final int flags;
-  String? uuid;
+  final String uuid;
   final int has_cover;
   final String last_modified;
   //Related classes
@@ -45,7 +46,8 @@ class Books extends Equatable implements DatabaseModel {
       this.last_modified = '',
       this.formats,
       this.authors,
-      this.comment});
+      this.comment,
+      required this.uuid});
 
   //Convert a Map object to a model object
   @override

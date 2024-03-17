@@ -1,10 +1,9 @@
 // ignore_for_file: non_constant_identifier_names, must_be_immutable
-
 import 'package:equatable/equatable.dart';
-
 import 'database_model.dart';
 
 class Identifiers extends Equatable implements DatabaseModel {
+  @override
   int? id;
   int book;
   String type;

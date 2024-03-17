@@ -17,8 +17,8 @@ class NextButton extends StatelessWidget {
         }
         final enabled = snapshot.data!;
         return ElevatedButton(
-          child: const Text("Next"),
           onPressed: enabled ? context.wizardController.goNext : null,
+          child: const Text("Next"),
         );
       },
     );

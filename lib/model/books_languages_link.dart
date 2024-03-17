@@ -1,10 +1,9 @@
 // ignore_for_file: must_be_immutable, non_constant_identifier_names
-
 import 'package:equatable/equatable.dart';
-
 import 'database_model.dart';
 
 class BooksLanguagesLink extends Equatable implements DatabaseModel {
+  @override
   int? id;
   final int book;
   final int lang_code;

@@ -1,8 +1,8 @@
 import 'package:flutibre/model/booklist_item.dart';
+import 'package:flutibre/model/books.dart';
+import 'package:flutibre/model/authors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../model/authors.dart';
-import '../model/books.dart';
 import '../providers/booklist_provider.dart';
 
 class EditScreen extends StatefulWidget {
@@ -16,7 +16,7 @@ class EditScreen extends StatefulWidget {
 }
 
 class _EditScreenState extends State<EditScreen> {
-  BookListItem? oldBook;
+  BookListItem? oldBookListItem;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _authorController = TextEditingController();
   final TextEditingController _commentController = TextEditingController();
@@ -32,25 +32,24 @@ class _EditScreenState extends State<EditScreen> {
   @override
   Widget build(BuildContext context) {
     var routeSettings = ModalRoute.of(context)!.settings;
-    if (routeSettings.arguments != null) {
-      oldBook = routeSettings.arguments as BookListItem;
-      _titleController.text = oldBook?.title ?? '';
-      _authorController.text = oldBook?.authors ?? '';
-      _commentController.text = oldBook?.comments ?? '';
-    } else {
-      oldBook = null;
-    }
+    final route = ModalRoute.of(context)?.settings.name;
+
+    oldBookListItem = routeSettings.arguments as BookListItem;
+    _titleController.text = oldBookListItem?.title ?? '';
+    _authorController.text = oldBookListItem?.authors ?? '';
+    _commentController.text = oldBookListItem?.comments ?? '';
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
         actions: [
-          oldBook != null
+          route != '/addpage'
               ? IconButton(
                   tooltip: 'Delete book',
                   icon: const Icon(Icons.delete),
                   onPressed: () {
                     Provider.of<BooksListProvider>(context, listen: false)
-                        .delete(oldBook!.id);
+                        .delete(oldBookListItem!.id);
                     Navigator.pop(context);
                   },
                 )
@@ -65,36 +64,52 @@ class _EditScreenState extends State<EditScreen> {
           ElevatedButton(
               onPressed: () {
                 DateTime addDateTime = DateTime.now();
-                String authorSort = sortingAuthor(_commentController.text);
-                BookListItem newBook = BookListItem(
-                    id: oldBook!.id,
-                    title: _titleController.text,
-                    authors: _authorController.text,
-                    last_modified:
-                        '${addDateTime.toString().substring(0, 19)}+00:00',
-                    sort: _titleController.text,
-                    author_sort: authorSort,
-                    timestamp:
-                        '${addDateTime.toString().substring(0, 19)}+00:00');
-                newBook.title = _titleController.text;
-                newBook.authors = _authorController.text;
-                newBook.comments = _commentController.text;
-                print('OldBook: $oldBook');
-                print('NewBook: $newBook');
-                print(oldBook == newBook);
-                if (oldBook != null && oldBook != newBook) {
-                  print('eltér');
-                  /*   Provider.of<BooksListProvider>(context, listen: false).update(
+                String authorSort = sortingAuthor(_authorController.text);
+                BookListItem newBookListItem = BookListItem(
+                  //  id: oldBookListItem!.id,
+                  title: _titleController.text,
+                  authors: _authorController.text,
+                  last_modified:
+                      '${addDateTime.toString().substring(0, 19)}+00:00',
+                  sort: _titleController.text,
+                  author_sort: authorSort,
+                  timestamp: '${addDateTime.toString().substring(0, 19)}+00:00',
+                );
+                newBookListItem.title = _titleController.text;
+                newBookListItem.authors = _authorController.text;
+                newBookListItem.comments = _commentController.text;
+                if (route == '/editpage' &&
+                    oldBookListItem != newBookListItem) {
+                  Books newBook = Books(
+                      id: newBookListItem.id,
+                      title: newBookListItem.title,
+                      uuid: oldBookListItem!.uuid);
+                  Provider.of<BooksListProvider>(context, listen: false).update(
                       book: newBook,
                       author: Authors(
                           name: 'Brandon Sanderson',
                           sort: 'Sanderson, Brandon'),
-                      id: oldBook!.id)*/
-                  ;
-                } else if (oldBook == null) {
-                  /* Authors author = Authors(name: _commentController.text, sort: authorSort);
+                      id: oldBookListItem!.id);
+                } else if (route == '/addpage') {
+                  String authorSort = sortingAuthor(_authorController.text);
+                  print('Első futás');
+                  DateTime addDateTime = DateTime.now();
+                  Books newBook = Books(
+                    id: newBookListItem.id,
+                    title: newBookListItem.title,
+                    uuid: oldBookListItem!.uuid,
+                    sort: newBookListItem.title,
+                    author_sort: authorSort,
+                    path: oldBookListItem!.path,
+                    timestamp:
+                        '${addDateTime.toString().substring(0, 19)}+00:00',
+                    last_modified:
+                        '${addDateTime.toString().substring(0, 19)}+00:00',
+                  );
+                  Authors author =
+                      Authors(name: _authorController.text, sort: authorSort);
                   Provider.of<BooksListProvider>(context, listen: false)
-                      .insert(book: newBook, author: author);*/
+                      .insert(book: newBook, author: author);
                 }
 
                 //context.read<TodoProvider>().insertTodo(todo);
@@ -110,11 +125,18 @@ class _EditScreenState extends State<EditScreen> {
   String sortingAuthor(String author) {
     List<String> authorSplit = author.split(' ');
     String authorSort = authorSplit[authorSplit.length - 1];
-    authorSplit.removeLast();
-    for (var item in authorSplit) {
-      authorSort = '$authorSort, $item';
+
+    String authorLast = '';
+    if (authorSplit.length > 1) {
+      authorSplit.removeLast();
+      for (var item in authorSplit) {
+        authorLast = '$authorLast, $item';
+      }
     }
-    return authorSort;
+
+    authorLast = authorLast.replaceAll(",", "");
+
+    return '$authorSort,$authorLast';
   }
 
   void clerControllers() {
