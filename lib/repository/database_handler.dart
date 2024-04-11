@@ -22,6 +22,17 @@ class DatabaseHandler {
   static Database? _database;
   final db = 'metadata';
 
+  Map<String, String> triggers = {
+    'insert': 'DROP TRIGGER books_insert_trg',
+    'update': 'DROP TRIGGER books_update_trg',
+    'createinsert': '''CREATE TRIGGER books_insert_trg AFTER INSERT ON books
+          BEGIN UPDATE books SET sort=title_sort(NEW.title),uuid=uuid4()
+          WHERE id=NEW.id; END''',
+    'updateinsert': '''CREATE TRIGGER books_update_trg AFTER UPDATE ON books 
+            BEGIN UPDATE books SET sort=title_sort(NEW.title) 
+            WHERE id=NEW.id AND OLD.title NEW.title; END'''
+  };
+
   DatabaseHandler._createInstance();
 
   Future<Database> get database async {
@@ -39,7 +50,7 @@ class DatabaseHandler {
     final databaseFactory = databaseFactoryFfi;
     //final appDocumentsDir = await getApplicationDocumentsDirectory();
     //final dbPath = join(appDocumentsDir.path, "databases", "$db.db");
-    const dbPath = "/home/sire/Sablonok/Ebooks2/metadata.db";
+    const dbPath = "/home/sire/Sablonok/Ebooks3/metadata.db";
     final database = await databaseFactory.openDatabase(
       dbPath,
       options: OpenDatabaseOptions(
@@ -235,8 +246,7 @@ class DatabaseHandler {
     return items as Future<List<DatabaseModel?>>;
   }
 
-  // Fetch Operation: Get item from database by id
-  //TODO
+  // Fetch Operation: Get item from database by field
   Future<List<DatabaseModel>> selectItemsByField(
       {required String table,
       required String type,
@@ -309,7 +319,7 @@ class DatabaseHandler {
     try {
       if (dropTrigger != null) {
         try {
-          db.execute(dropTrigger);
+          db.execute(triggers[dropTrigger]!);
         } catch (e) {
           throw Exception('Some error$e');
         }
@@ -321,7 +331,7 @@ class DatabaseHandler {
     } finally {
       if (createTrigger != null) {
         try {
-          db.execute(createTrigger);
+          db.execute(triggers[createTrigger]!);
         } catch (e) {
           throw Exception('Some error$e');
         }
@@ -369,6 +379,13 @@ class DatabaseHandler {
   Future<int> delete(String tableName, int id) async {
     var db = await database;
     int result = await db.delete(tableName, where: 'id = ?', whereArgs: [id]);
+    return result;
+  }
+
+  // Delete Operation: Delete record from database
+  Future<List> getSqliteSequence() async {
+    Database db = await database;
+    Future<List<Map<String, dynamic>>> result = db.query('sqlite_sequence');
     return result;
   }
 

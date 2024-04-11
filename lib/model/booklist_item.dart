@@ -19,7 +19,7 @@ class BookListItem extends Equatable {
   String formats;
   String isbn;
   String path;
-  String filename;
+  String name;
   String lccn;
   String pubdate;
   String last_modified;
@@ -43,7 +43,7 @@ class BookListItem extends Equatable {
     this.formats = '',
     this.isbn = '',
     this.path = '',
-    this.filename = '',
+    this.name = '',
     this.lccn = '',
     this.pubdate = '',
     this.last_modified = '',
@@ -68,7 +68,7 @@ class BookListItem extends Equatable {
         formats = res['formats'].toString().toLowerCase(),
         isbn = res['isbn'],
         path = res['path'],
-        filename = res['filename'] ?? '',
+        name = res['filename'] ?? '',
         lccn = res['lccn'],
         pubdate = res['pubdate'],
         last_modified = res['last_modified'],
@@ -77,7 +77,7 @@ class BookListItem extends Equatable {
 
   @override
   String toString() {
-    return 'BookListItem(id : $id, authors : $authors, title : $title, formats : $formats)';
+    return 'BookListItem(id : $id, authors : $authors, title : $title, formats : $formats, size: $size, path: $path, uuid: $uuid)';
   }
 
   @override
@@ -98,7 +98,7 @@ class BookListItem extends Equatable {
         formats,
         isbn,
         path,
-        filename,
+        name,
         lccn,
         pubdate,
         last_modified,

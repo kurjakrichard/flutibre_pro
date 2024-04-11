@@ -10,6 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  async_zip: ^0.1.0
+  archive: ^3.4.10
   path_provider: ^2.1.1
   path: ^1.8.3
   sqlite3: ^2.1.0

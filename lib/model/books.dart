@@ -42,7 +42,7 @@ class Books extends Equatable implements DatabaseModel {
       this.lccn = '',
       this.path = '',
       this.flags = 1,
-      this.has_cover = 0,
+      this.has_cover = 1,
       this.last_modified = '',
       this.formats,
       this.authors,
@@ -70,26 +70,29 @@ class Books extends Equatable implements DatabaseModel {
   //Convert a model object to a Map opject
   @override
   Map<String, Object?> toMap() {
-    return {
-      'title': title,
-      'sort': sort,
-      'timestamp': timestamp,
-      'pubdate': pubdate,
-      'series_index': series_index,
-      'author_sort': author_sort,
-      'isbn': isbn,
-      'lccn': lccn,
-      'path': path,
-      'flags': flags,
-      'uuid': uuid,
-      'has_cover': has_cover,
-      'last_modified': last_modified
-    };
+    Map<String, dynamic> map = <String, dynamic>{};
+    if (id != null) {
+      map['id'] = id;
+    }
+    map['title'] = title;
+    map['sort'] = sort;
+    map['timestamp'] = timestamp;
+    map['pubdate'] = pubdate;
+    map['series_index'] = series_index;
+    map['author_sort'] = author_sort;
+    map['isbn'] = isbn;
+    map['lccn'] = lccn;
+    map['path'] = path;
+    map['flags'] = flags;
+    map['uuid'] = uuid;
+    map['has_cover'] = has_cover;
+    map['last_modified'] = last_modified;
+    return map;
   }
 
   @override
   String toString() {
-    return 'Books(id : $id, title : $title, sort : $sort, author_sort : $author_sort)';
+    return 'Books(id : $id, title : $title, sort : $sort, author_sort : $author_sort, path: $path)';
   }
 
   @override

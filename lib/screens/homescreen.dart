@@ -1,10 +1,16 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutibre/model/booklist_item.dart';
+import 'package:flutibre/repository/database_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 import 'package:provider/provider.dart';
 import 'package:remove_diacritic/remove_diacritic.dart';
 import 'package:uuid/uuid.dart';
+import '../model/authors.dart';
+import '../model/books.dart';
+import '../model/data.dart';
 import '../providers/booklist_provider.dart';
 import '../service/file_service.dart';
 
@@ -17,11 +23,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   BookListItem? selectedBook;
+  DatabaseHandler databaseHandler = DatabaseHandler();
   // ignore: prefer_typing_uninitialized_variables
   var bookList;
   PlatformFile? _pickedfile;
   // ignore: unused_field
-  bool _isLoading = false;
   FileService fileService = FileService();
   var allowedExtensions = ['pdf', 'odt', 'epub', 'mobi'];
 
@@ -34,24 +40,24 @@ class _HomeScreenState extends State<HomeScreen> {
       return Scaffold(
         appBar: AppBar(title: const Text('Flutibre')),
         floatingActionButton: FloatingActionButton(
-          shape: const CircleBorder(),
-          child: const Icon(Icons.add),
-          onPressed: () async {
-            BookListItem? newBook = await pickFile(provider);
+            shape: const CircleBorder(),
+            child: const Icon(Icons.add),
+            onPressed: () async {
+              BookListItem? newBook = await pickfile(provider);
 
-            Navigator.of(context)
-                .pushNamed('/addpage', arguments: newBook)
-                .then(
-                  (_) => setState(
-                    () {
-                      bookList =
-                          Provider.of<BooksListProvider>(context, listen: false)
-                              .selectAll();
-                    },
-                  ),
-                );
-          },
-        ),
+              // ignore: use_build_context_synchronously
+              Navigator.of(context)
+                  .pushNamed('/addpage', arguments: newBook)
+                  .then(
+                    (_) => setState(
+                      () {
+                        bookList = Provider.of<BooksListProvider>(context,
+                                listen: false)
+                            .selectAll();
+                      },
+                    ),
+                  );
+            }),
         body: FutureBuilder(
           future: bookList,
           //Provider.of<BooksListProvider>(context, listen: false).selectAll(),
@@ -80,12 +86,12 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  String getUuid(BooksListProvider provider) {
+  String getUuid(List<BookListItem> items) {
     var uuid = const Uuid();
     String bookUuid = uuid.v1();
 
-    if (provider.items.map((item) => item.uuid).contains(bookUuid)) {
-      getUuid(provider);
+    if (items.map((item) => item.uuid).contains(bookUuid)) {
+      getUuid(items);
     } else {
       return bookUuid;
     }
@@ -314,7 +320,7 @@ class _HomeScreenState extends State<HomeScreen> {
           'formats': PlutoCell(value: item.formats),
           'isbn': PlutoCell(value: item.isbn),
           'path': PlutoCell(value: item.path),
-          'filename': PlutoCell(value: item.filename),
+          'filename': PlutoCell(value: item.name),
           'lccn': PlutoCell(value: item.lccn),
           'pubdate': PlutoCell(value: item.pubdate),
           'last_modified': PlutoCell(value: item.last_modified),
@@ -335,6 +341,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       onSelected: (event) {
         int index = stateManager.currentRow!.cells.values.first.value;
+        //TODO checkbook
         selectedBook =
             provider.items.firstWhere((element) => element.id == index);
 
@@ -354,14 +361,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<BookListItem?> pickFile(BooksListProvider provider) async {
-    BookListItem? newBook;
-    String bookUuid = getUuid(provider);
+  Future<BookListItem?> pickfile(BooksListProvider provider) async {
+    List seq = await databaseHandler.getSqliteSequence();
+    int id = seq[0]['seq'] + 1;
+    BookListItem newBookListItem = BookListItem();
     try {
-      setState(() {
-        _isLoading = true;
-      });
-
       FilePickerResult? result = await FilePicker.platform.pickFiles(
           type: FileType.custom,
           allowMultiple: false,
@@ -369,41 +373,111 @@ class _HomeScreenState extends State<HomeScreen> {
 
       if (result != null) {
         _pickedfile = result.files.first;
-        // ignore: avoid_print
-        print('Name: ${_pickedfile!.name}');
-        // ignore: avoid_print
-        print('Bytes: ${_pickedfile!.bytes}');
-        // ignore: avoid_print
-        print('Size: ${_pickedfile!.size}');
-        // ignore: avoid_print
-        print('Extension: ${_pickedfile!.extension}');
-        // ignore: avoid_print
-        print('Path: ${_pickedfile!.path}');
-        newBook = BookListItem(
-            uuid: bookUuid,
-            size: _pickedfile!.size,
-            formats: _pickedfile!.extension!,
-            path: removeDiacritics(_pickedfile!.name));
-        await fileService.copyFile(
-            pickedfile: _pickedfile,
-            path: '/home/sire/Sablonok/Ebooks2',
-            filename: _pickedfile!.name,
+
+        File? newFile = await fileService.copyBook(
+            oldpath: _pickedfile!.path!,
+            path: '/home/sire/Sablonok/Ebooks3',
+            filename: _pickedfile!.name
+                .substring(0, _pickedfile!.name.lastIndexOf('.')),
             extension: _pickedfile!.extension!);
+
+        if (newFile.existsSync()) {
+          Map<String, String> authorTitle = getTitleAuthor(_pickedfile!.name);
+          String authorName = authorTitle['author']!;
+          String title = authorTitle['title']!;
+          String authorSort = sortingAuthor(authorName);
+          String path =
+              '${removeDiacritics(authorName)}/${removeDiacritics(title)}($id)';
+          newBookListItem = BookListItem(
+            id: id,
+            authors: authorName,
+            author_sort: authorSort,
+            title: title,
+            path: path,
+            formats: _pickedfile!.extension!,
+            size: _pickedfile!.size,
+          );
+          newBookListItem =
+              (await getBook(provider, newFile, newBookListItem))!;
+
+          DateTime addDateTime = DateTime.now();
+          Books newBook = Books(
+            id: newBookListItem.id,
+            title: newBookListItem.title,
+            uuid: newBookListItem.uuid,
+            sort: newBookListItem.title,
+            author_sort: authorSort,
+            path: newBookListItem.path,
+            timestamp: '${addDateTime.toString().substring(0, 19)}+00:00',
+            last_modified: '${addDateTime.toString().substring(0, 19)}+00:00',
+          );
+          Data data = Data(
+              name:
+                  '${removeDiacritics(title)} - ${removeDiacritics(authorName)}',
+              book: newBookListItem.id,
+              uncompressed_size: newBookListItem.size,
+              format: newBookListItem.formats);
+          Authors author = Authors(name: authorName, sort: authorSort);
+          // ignore: use_build_context_synchronously
+          Provider.of<BooksListProvider>(context, listen: false)
+              .insert(book: newBook, author: author, data: data);
+          print(newBookListItem.path);
+
+          File? bookFile = await fileService.copyBook(
+              oldpath: _pickedfile!.path!,
+              path: '/home/sire/Sablonok/Ebooks3/$path',
+              filename:
+                  '${removeDiacritics(title)} - ${removeDiacritics(authorName)}',
+              extension: newBookListItem.formats);
+        }
         //fileService.openFile(_pickedfile!.path!);
       } else {
-        setState(() {
-          _isLoading = false;
-        });
         return null;
       }
-
-      setState(() {
-        _isLoading = false;
-      });
     } catch (e) {
       // ignore: avoid_print
       print(e);
     }
+
+    return newBookListItem;
+  }
+
+  Future<BookListItem?> getBook(
+      BooksListProvider provider, File book, BookListItem newBook) async {
+    String bookUuid = getUuid(provider.items);
+
+    /* var newBook = BookListItem(uuid: bookUuid,size: _pickedfile!.size,formats: _pickedfile!.extension!,
+        path: removeDiacritics(_pickedfile!.name));*/
+    newBook.uuid = bookUuid;
+
     return newBook;
+  }
+
+  String sortingAuthor(String author) {
+    List<String> authorSplit = author.split(' ');
+    String authorSort = authorSplit[authorSplit.length - 1];
+
+    String authorLast = '';
+    if (authorSplit.length > 1) {
+      authorSplit.removeLast();
+      for (var item in authorSplit) {
+        authorLast = '$authorLast, $item';
+      }
+    }
+
+    authorLast = authorLast.replaceAll(",", "");
+
+    return '$authorSort,$authorLast';
+  }
+
+  Map<String, String> getTitleAuthor(String name) {
+    List<String> authorTitle = name.split('-');
+    Map<String, String> getTitleAuthor = {
+      'title': authorTitle[0].replaceAll('_', ' ').trim(),
+      'author': authorTitle.length < 2
+          ? 'unknow author'
+          : authorTitle[1].split('.').first.replaceAll('_', ' ').trim()
+    };
+    return getTitleAuthor;
   }
 }

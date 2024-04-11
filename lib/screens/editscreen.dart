@@ -92,7 +92,6 @@ class _EditScreenState extends State<EditScreen> {
                       id: oldBookListItem!.id);
                 } else if (route == '/addpage') {
                   String authorSort = sortingAuthor(_authorController.text);
-                  print('Első futás');
                   DateTime addDateTime = DateTime.now();
                   Books newBook = Books(
                     id: newBookListItem.id,

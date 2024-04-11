@@ -1,19 +1,23 @@
 import 'dart:io';
-import 'package:file_picker/file_picker.dart';
 import 'package:open_filex/open_filex.dart';
-import 'package:remove_diacritic/remove_diacritic.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class FileService {
   void openFile({required String path}) {
     OpenFilex.open(path);
   }
 
-  Future<File> copyFile(
-      {required PlatformFile? pickedfile,
+  Future<File> copyBook(
+      {required String oldpath,
       required String path,
       required String filename,
       required String extension}) async {
-    final newFile = File('path/${removeDiacritics(filename)}.extension');
-    return File(pickedfile!.path!).copy(newFile.path);
+    File oldFile = File(oldpath);
+    print(filename);
+    return await File('$path/$filename.$extension')
+        .create(recursive: true)
+        .then((File file) {
+      return oldFile.copy('$path/$filename.$extension');
+    });
   }
 }

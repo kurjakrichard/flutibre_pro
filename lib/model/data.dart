@@ -34,7 +34,7 @@ class Data extends Equatable implements DatabaseModel {
       map['id'] = id;
     }
     map['book'] = book;
-    map['format'] = format;
+    map['format'] = format.toUpperCase();
     map['uncompressed_size'] = uncompressed_size;
     map['name'] = name;
     return map;
