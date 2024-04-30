@@ -108,7 +108,7 @@ class _EditScreenState extends State<EditScreen> {
                   Authors author =
                       Authors(name: _authorController.text, sort: authorSort);
                   Provider.of<BooksListProvider>(context, listen: false)
-                      .insert(book: newBook, author: author);
+                      .insert(newBookListItem: newBookListItem);
                 }
 
                 //context.read<TodoProvider>().insertTodo(todo);

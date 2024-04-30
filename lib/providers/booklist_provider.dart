@@ -1,36 +1,61 @@
 import 'package:flutibre/model/booklist_item.dart';
 import 'package:flutibre/model/database_model.dart';
 import 'package:flutter/foundation.dart';
+import 'package:remove_diacritic/remove_diacritic.dart';
 import '../model/authors.dart';
 import '../model/books.dart';
 import '../model/books_authors_link.dart';
-import '../model/comments.dart';
 import '../model/data.dart';
 import '../repository/database_handler.dart';
 
+import '../service/file_service.dart';
+
 class BooksListProvider extends ChangeNotifier {
   List<BookListItem> items = [];
+  DatabaseHandler databaseHandler = DatabaseHandler();
+  FileService fileService = FileService();
 
   Future<void> selectAll() async {
-    var databaseHandler = DatabaseHandler();
     items = await databaseHandler.getBookItemList();
-
     notifyListeners();
   }
 
-  Future insert(
-      {required Books book,
-      required Authors author,
-      Data? data,
-      Comments? comment}) async {
-    var databaseHandler = DatabaseHandler();
+  Future insert({required BookListItem newBookListItem}) async {
     //Authors item = Authors(name: author.name, sort: author.name);
     //databaseHandler.insert(table: 'authors', item: item);
+
+    Books newBook = Books(
+        id: newBookListItem.id,
+        title: newBookListItem.title,
+        uuid: newBookListItem.uuid,
+        sort: newBookListItem.title,
+        author_sort: newBookListItem.author_sort,
+        path: newBookListItem.path,
+        has_cover: newBookListItem.has_cover,
+        timestamp: newBookListItem.timestamp,
+        last_modified: newBookListItem.last_modified);
+
+    Data data = Data(
+        name:
+            '${removeDiacritics(newBookListItem.title)} - ${removeDiacritics(newBookListItem.authors)}',
+        book: newBookListItem.id,
+        uncompressed_size: newBookListItem.size,
+        format: newBookListItem.formats);
+
+    Authors author = Authors(
+        name: newBookListItem.authors, sort: newBookListItem.author_sort);
+    print('/home/sire/Sablonok/Ebooks3/${newBookListItem.path}');
+    await fileService.copyFile(
+        oldpath: '/home/sire/Sablonok/Ebooks3/${newBookListItem.name}',
+        path: '/home/sire/Sablonok/Ebooks3/${newBookListItem.path}',
+        filename:
+            '${removeDiacritics(newBookListItem.title)} - ${removeDiacritics(newBookListItem.authors)}',
+        extension: newBookListItem.formats);
 
     int bookId = await databaseHandler.insert(
       dropTrigger: 'insert',
       table: 'books',
-      item: book,
+      item: newBook,
       createTrigger: 'createinsert',
     );
     await databaseHandler.insert(

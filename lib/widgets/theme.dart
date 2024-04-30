@@ -10,6 +10,7 @@ ThemeData baseTheme = ThemeData(
     backgroundColor: Colors.cyan,
     foregroundColor: Colors.white,
   ),
+  textTheme: const TextTheme(titleMedium: TextStyle(color: Colors.white)),
   scaffoldBackgroundColor: Colors.cyan[50],
   fontFamily: 'Roboto',
   floatingActionButtonTheme: const FloatingActionButtonThemeData(

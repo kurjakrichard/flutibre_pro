@@ -8,9 +8,6 @@ import 'package:pluto_grid/pluto_grid.dart';
 import 'package:provider/provider.dart';
 import 'package:remove_diacritic/remove_diacritic.dart';
 import 'package:uuid/uuid.dart';
-import '../model/authors.dart';
-import '../model/books.dart';
-import '../model/data.dart';
 import '../providers/booklist_provider.dart';
 import '../service/file_service.dart';
 
@@ -22,83 +19,114 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool isSearching = false;
+  List<BookListItem> books = [];
+  List<BookListItem> filteredBooks = [];
   BookListItem? selectedBook;
   DatabaseHandler databaseHandler = DatabaseHandler();
   // ignore: prefer_typing_uninitialized_variables
-  var bookList;
+
   PlatformFile? _pickedfile;
   // ignore: unused_field
   FileService fileService = FileService();
   var allowedExtensions = ['pdf', 'odt', 'epub', 'mobi'];
 
   @override
+  void initState() {
+    Provider.of<BooksListProvider>(context, listen: false).selectAll();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    bookList =
-        Provider.of<BooksListProvider>(context, listen: false).selectAll();
     return Consumer<BooksListProvider>(builder:
         (BuildContext context, BooksListProvider provider, Widget? child) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Flutibre')),
-        floatingActionButton: FloatingActionButton(
-            shape: const CircleBorder(),
-            child: const Icon(Icons.add),
-            onPressed: () async {
-              BookListItem? newBook = await pickfile(provider);
+          appBar: appBar(context),
+          floatingActionButton: FloatingActionButton(
+              shape: const CircleBorder(),
+              child: const Icon(Icons.add),
+              onPressed: () async {
+                BookListItem? newBook = await pickfile(provider);
+                // ignore: use_build_context_synchronously
+                Provider.of<BooksListProvider>(context, listen: false)
+                    .insert(newBookListItem: newBook!);
 
-              // ignore: use_build_context_synchronously
-              Navigator.of(context)
-                  .pushNamed('/addpage', arguments: newBook)
-                  .then(
-                    (_) => setState(
-                      () {
-                        bookList = Provider.of<BooksListProvider>(context,
-                                listen: false)
-                            .selectAll();
-                      },
-                    ),
-                  );
-            }),
-        body: FutureBuilder(
-          future: bookList,
-          //Provider.of<BooksListProvider>(context, listen: false).selectAll(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              return Consumer<BooksListProvider>(
-                builder: (context, provider, child) {
-                  return provider.items.isNotEmpty
-                      ? plutoGrid(provider)
-                      : const Center(
-                          child: Text(
-                            'List has no data',
-                            style: TextStyle(fontSize: 35, color: Colors.black),
-                          ),
-                        );
-                },
-              );
-            } else {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-          },
-        ),
-      );
+                // ignore: use_build_context_synchronously
+                Navigator.of(context)
+                    .pushNamed('/readpage', arguments: newBook)
+                    .then(
+                      (_) => setState(
+                        () {
+                          Provider.of<BooksListProvider>(context, listen: false)
+                              .selectAll();
+                        },
+                      ),
+                    );
+              }),
+          body: Consumer<BooksListProvider>(
+            builder: (context, provider, child) {
+              books = provider.items;
+              filteredBooks = filteredBooks.isEmpty ? books : filteredBooks;
+              return books.isNotEmpty
+                  ? plutoGrid(filteredBooks)
+                  : const Center(child: CircularProgressIndicator());
+            },
+          ));
     });
   }
 
-  String getUuid(List<BookListItem> items) {
+  String getUuid() {
     var uuid = const Uuid();
     String bookUuid = uuid.v1();
 
-    if (items.map((item) => item.uuid).contains(bookUuid)) {
-      getUuid(items);
+    if (books.map((item) => item.uuid).contains(bookUuid)) {
+      getUuid();
     } else {
       return bookUuid;
     }
     return bookUuid;
   }
 
-  Widget datatable(BooksListProvider provider) {
+  PreferredSizeWidget? appBar(BuildContext context) {
+    return AppBar(
+      title: !isSearching
+          ? const Text('Flutibre')
+          : TextField(
+              onChanged: (value) => filteredBook(value),
+              cursorColor: Colors.white,
+              style: Theme.of(context).textTheme.titleMedium,
+              decoration: const InputDecoration(
+                icon: Icon(
+                  Icons.search,
+                  color: Colors.white,
+                ),
+                hintText: 'Search book',
+                //hintStyle: TextStyle(color: Colors.white)
+              ),
+            ),
+      actions: <Widget>[
+        isSearching
+            ? IconButton(
+                onPressed: () {
+                  setState(() {
+                    isSearching = false;
+                    filteredBooks = books;
+                  });
+                },
+                icon: const Icon(Icons.cancel))
+            : IconButton(
+                onPressed: () {
+                  setState(() {
+                    isSearching = true;
+                  });
+                },
+                icon: const Icon(Icons.search))
+      ],
+    );
+  }
+
+  Widget datatable(List<BookListItem> books) {
     List<DataColumn> columns = [
       const DataColumn(label: Text('id')),
       const DataColumn(label: Text('title')),
@@ -125,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return DataTable(
       columns: columns,
       rows: [
-        for (BookListItem item in provider.items)
+        for (BookListItem item in books)
           DataRow(cells: <DataCell>[
             DataCell(Text(item.id.toString())),
             DataCell(Text(item.title)),
@@ -152,15 +180,15 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget list(BooksListProvider provider) {
+  Widget list(List<BookListItem> filteredBooks) {
     return ListView.builder(
-      itemCount: provider.items.length,
+      itemCount: filteredBooks.length,
       itemBuilder: (context, index) {
         return Card(
           elevation: 5,
           child: ListTile(
             onTap: () async {
-              selectedBook = provider.items[index];
+              selectedBook = filteredBooks[index];
 
               if (!context.mounted) return;
               Navigator.of(context)
@@ -168,16 +196,16 @@ class _HomeScreenState extends State<HomeScreen> {
               //provider.delete(provider.items[index]);
             },
             style: ListTileStyle.drawer,
-            title: Text(provider.items[index].authors),
-            subtitle: Text(provider.items[index].title),
-            trailing: Text(provider.items[index].series ?? ''),
+            title: Text(filteredBooks[index].authors),
+            subtitle: Text(filteredBooks[index].title),
+            trailing: Text(filteredBooks[index].series ?? ''),
           ),
         );
       },
     );
   }
 
-  Widget plutoGrid(BooksListProvider provider) {
+  Widget plutoGrid(List<BookListItem> books) {
     late final PlutoGridStateManager stateManager;
 
     final List<PlutoColumn> columns = <PlutoColumn>[
@@ -302,7 +330,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
 
     List<PlutoRow> rows = [
-      for (var item in provider.items)
+      for (var item in books)
         PlutoRow(cells: {
           'id': PlutoCell(value: item.id),
           'title': PlutoCell(value: item.title),
@@ -341,9 +369,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       onSelected: (event) {
         int index = stateManager.currentRow!.cells.values.first.value;
-        //TODO checkbook
-        selectedBook =
-            provider.items.firstWhere((element) => element.id == index);
+        selectedBook = books.firstWhere((book) => book.id == index);
 
         Navigator.pushNamed(
           context,
@@ -373,62 +399,38 @@ class _HomeScreenState extends State<HomeScreen> {
 
       if (result != null) {
         _pickedfile = result.files.first;
+        String fileName =
+            _pickedfile!.name.substring(0, _pickedfile!.name.lastIndexOf('.'));
 
-        File? newFile = await fileService.copyBook(
+        File? newFile = await fileService.copyFile(
             oldpath: _pickedfile!.path!,
             path: '/home/sire/Sablonok/Ebooks3',
-            filename: _pickedfile!.name
-                .substring(0, _pickedfile!.name.lastIndexOf('.')),
+            filename: fileName,
             extension: _pickedfile!.extension!);
 
         if (newFile.existsSync()) {
+          print('A fájl létezik');
+          DateTime addDateTime = DateTime.now();
           Map<String, String> authorTitle = getTitleAuthor(_pickedfile!.name);
           String authorName = authorTitle['author']!;
           String title = authorTitle['title']!;
           String authorSort = sortingAuthor(authorName);
           String path =
               '${removeDiacritics(authorName)}/${removeDiacritics(title)}($id)';
+          String bookUuid = getUuid();
           newBookListItem = BookListItem(
-            id: id,
-            authors: authorName,
-            author_sort: authorSort,
-            title: title,
-            path: path,
-            formats: _pickedfile!.extension!,
-            size: _pickedfile!.size,
-          );
-          newBookListItem =
-              (await getBook(provider, newFile, newBookListItem))!;
-
-          DateTime addDateTime = DateTime.now();
-          Books newBook = Books(
-            id: newBookListItem.id,
-            title: newBookListItem.title,
-            uuid: newBookListItem.uuid,
-            sort: newBookListItem.title,
-            author_sort: authorSort,
-            path: newBookListItem.path,
-            timestamp: '${addDateTime.toString().substring(0, 19)}+00:00',
-            last_modified: '${addDateTime.toString().substring(0, 19)}+00:00',
-          );
-          Data data = Data(
-              name:
-                  '${removeDiacritics(title)} - ${removeDiacritics(authorName)}',
-              book: newBookListItem.id,
-              uncompressed_size: newBookListItem.size,
-              format: newBookListItem.formats);
-          Authors author = Authors(name: authorName, sort: authorSort);
-          // ignore: use_build_context_synchronously
-          Provider.of<BooksListProvider>(context, listen: false)
-              .insert(book: newBook, author: author, data: data);
-          print(newBookListItem.path);
-
-          File? bookFile = await fileService.copyBook(
-              oldpath: _pickedfile!.path!,
-              path: '/home/sire/Sablonok/Ebooks3/$path',
-              filename:
-                  '${removeDiacritics(title)} - ${removeDiacritics(authorName)}',
-              extension: newBookListItem.formats);
+              id: id,
+              authors: authorName,
+              author_sort: authorSort,
+              title: title,
+              path: path,
+              name: _pickedfile!.name,
+              formats: _pickedfile!.extension!,
+              size: _pickedfile!.size,
+              has_cover: 0,
+              timestamp: '${addDateTime.toString().substring(0, 19)}+00:00',
+              last_modified: '${addDateTime.toString().substring(0, 19)}+00:00',
+              uuid: bookUuid);
         }
         //fileService.openFile(_pickedfile!.path!);
       } else {
@@ -440,17 +442,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     return newBookListItem;
-  }
-
-  Future<BookListItem?> getBook(
-      BooksListProvider provider, File book, BookListItem newBook) async {
-    String bookUuid = getUuid(provider.items);
-
-    /* var newBook = BookListItem(uuid: bookUuid,size: _pickedfile!.size,formats: _pickedfile!.extension!,
-        path: removeDiacritics(_pickedfile!.name));*/
-    newBook.uuid = bookUuid;
-
-    return newBook;
   }
 
   String sortingAuthor(String author) {
@@ -479,5 +470,11 @@ class _HomeScreenState extends State<HomeScreen> {
           : authorTitle[1].split('.').first.replaceAll('_', ' ').trim()
     };
     return getTitleAuthor;
+  }
+
+  void filteredBook(String value) {
+    setState(() {
+      filteredBooks = books.where((book) => book.title == value).toList();
+    });
   }
 }
