@@ -1,55 +1,35 @@
-import 'package:flutibre/model/booklist_item.dart';
-import 'package:flutibre/model/database_model.dart';
-import 'package:flutter/foundation.dart';
-import 'package:remove_diacritic/remove_diacritic.dart';
+import 'package:archive/archive.dart';
+
 import '../model/authors.dart';
 import '../model/books.dart';
 import '../model/books_authors_link.dart';
 import '../model/data.dart';
+import '../model/database_model.dart';
 import '../repository/database_handler.dart';
 
-import '../service/file_service.dart';
-
-class BooksListProvider extends ChangeNotifier {
-  List<BookListItem> items = [];
+class DatabaseService {
   DatabaseHandler databaseHandler = DatabaseHandler();
-  FileService fileService = FileService();
 
-  Future<void> selectAll() async {
-    items = await databaseHandler.getBookItemList();
-    notifyListeners();
-  }
-
-  Future insert({required BookListItem newBookListItem}) async {
-    //Authors item = Authors(name: author.name, sort: author.name);
-    //databaseHandler.insert(table: 'authors', item: item);
+  Future insert() async {
+    Authors author = Authors(
+        id: 15, name: 'Robert Jordan', sort: 'Jordan, Robert', link: 'empty');
+    databaseHandler.insert(table: 'authors', item: author);
 
     Books newBook = Books(
-        id: newBookListItem.id,
-        title: newBookListItem.title,
-        uuid: newBookListItem.uuid,
-        sort: newBookListItem.title,
-        author_sort: newBookListItem.author_sort,
-        path: newBookListItem.path,
-        has_cover: newBookListItem.has_cover,
-        timestamp: newBookListItem.timestamp,
-        last_modified: newBookListItem.last_modified);
-
-    Data data = Data(
-        name:
-            '${removeDiacritics(newBookListItem.title)} - ${removeDiacritics(newBookListItem.authors)}',
-        book: newBookListItem.id,
-        uncompressed_size: newBookListItem.size,
-        format: newBookListItem.formats);
-
-    Authors author = Authors(
-        name: newBookListItem.authors, sort: newBookListItem.author_sort);
-    await fileService.copyFile(
-        oldpath: '/home/sire/Sablonok/Ebooks3/${newBookListItem.name}',
-        path: '/home/sire/Sablonok/Ebooks3/${newBookListItem.path}',
-        filename:
-            '${removeDiacritics(newBookListItem.title)} - ${removeDiacritics(newBookListItem.authors)}',
-        extension: newBookListItem.formats);
+        id: 12,
+        title: 'Az újjászületett sárkány',
+        sort: 'újjászületett sárkány, az',
+        timestamp: '2022-11-10 10:24:50.674242+00:00',
+        pubdate: '2022-11-10 10:24:50.674242+00:00',
+        series_index: 1,
+        author_sort: 'Jordan, Robert',
+        isbn: 'isbn',
+        lccn: 'lccn',
+        path: 'Robert Jordan/Az újjászületett sárkány(12)',
+        flags: 1,
+        uuid: '5f546874-838a-4c01-aaeb-77fb4d08f20e',
+        has_cover: 0,
+        last_modified: '2022-11-10 10:24:50.674242+00:00');
 
     int bookId = await databaseHandler.insert(
       dropTrigger: 'insert',
@@ -57,6 +37,15 @@ class BooksListProvider extends ChangeNotifier {
       item: newBook,
       createTrigger: 'createinsert',
     );
+
+    Data data = Data(
+      id: 11,
+      book: 11,
+      uncompressed_size: 1220,
+      format: 'epub',
+      name: 'Veled jatszom - A. L. Jackson',
+    );
+
     await databaseHandler.insert(
       table: 'data',
       item: data,
@@ -82,16 +71,11 @@ class BooksListProvider extends ChangeNotifier {
       table: 'books_authors_link',
       item: BooksAuthorsLink(book: bookId, author: authorId),
     );
-
-    selectAll();
-    notifyListeners();
   }
 
   void delete(int id) async {
     var databaseHandler = DatabaseHandler();
     await databaseHandler.delete('books', id);
-    selectAll();
-    notifyListeners();
   }
 
   Future update({
@@ -128,8 +112,5 @@ class BooksListProvider extends ChangeNotifier {
       table: 'books_authors_link',
       item: BooksAuthorsLink(book: book.id!, author: authorId),
     );
-
-    selectAll();
-    notifyListeners();
   }
 }

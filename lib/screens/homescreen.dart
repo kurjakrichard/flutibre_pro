@@ -4,7 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutibre/model/booklist_item.dart';
 import 'package:flutibre/repository/database_handler.dart';
 import 'package:flutter/material.dart';
-import 'package:pluto_grid/pluto_grid.dart';
+//import 'package:pluto_grid/pluto_grid.dart';
 import 'package:provider/provider.dart';
 import 'package:remove_diacritic/remove_diacritic.dart';
 import 'package:uuid/uuid.dart';
@@ -69,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
               books = provider.items;
               filteredBooks = filteredBooks.isEmpty ? books : filteredBooks;
               return books.isNotEmpty
-                  ? plutoGrid(filteredBooks)
+                  ? datatable(filteredBooks)
                   : const Center(child: CircularProgressIndicator());
             },
           ));
@@ -205,7 +205,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget plutoGrid(List<BookListItem> books) {
+  /* Widget plutoGrid(List<BookListItem> books) {
     late final PlutoGridStateManager stateManager;
 
     final List<PlutoColumn> columns = <PlutoColumn>[
@@ -386,7 +386,7 @@ class _HomeScreenState extends State<HomeScreen> {
               PlutoGridColumnSizeConfig(autoSizeMode: PlutoAutoSizeMode.scale)),
     );
   }
-
+*/
   Future<BookListItem?> pickfile(BooksListProvider provider) async {
     List seq = await databaseHandler.getSqliteSequence();
     int id = seq[0]['seq'] + 1;
@@ -409,7 +409,6 @@ class _HomeScreenState extends State<HomeScreen> {
             extension: _pickedfile!.extension!);
 
         if (newFile.existsSync()) {
-          print('A fájl létezik');
           DateTime addDateTime = DateTime.now();
           Map<String, String> authorTitle = getTitleAuthor(_pickedfile!.name);
           String authorName = authorTitle['author']!;

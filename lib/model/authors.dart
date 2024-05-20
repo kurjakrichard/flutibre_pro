@@ -1,12 +1,10 @@
-// ignore_for_file: must_be_immutable
-import 'package:equatable/equatable.dart';
 import 'package:flutibre/model/database_model.dart';
 
-class Authors extends Equatable implements DatabaseModel {
+class Authors implements DatabaseModel {
   @override
   int? id;
   final String name;
-  final String sort;
+  String? sort;
   final String link;
 
   Authors({this.id, required this.name, required this.sort, this.link = ''});
@@ -36,7 +34,4 @@ class Authors extends Equatable implements DatabaseModel {
   String toString() {
     return 'Authors(id : $id, name : $name, sort : $sort, link : $link)';
   }
-
-  @override
-  List<Object?> get props => [name, sort, link];
 }

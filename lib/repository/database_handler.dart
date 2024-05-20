@@ -50,7 +50,7 @@ class DatabaseHandler {
     final databaseFactory = databaseFactoryFfi;
     //final appDocumentsDir = await getApplicationDocumentsDirectory();
     //final dbPath = join(appDocumentsDir.path, "databases", "$db.db");
-    const dbPath = "/home/sire/Sablonok/Ebooks3/metadata.db";
+    const dbPath = "/home/sire/Nyilvános/Ebooks2/metadata.db";
     final database = await databaseFactory.openDatabase(
       dbPath,
       options: OpenDatabaseOptions(
@@ -404,7 +404,7 @@ class DatabaseHandler {
 // This creates tables in our database.
   Future<void> _onCreate(Database database, int version) async {
     final db = database;
-    await db.execute(""" 
+    await db.execute("""
 CREATE TABLE authors ( id   INTEGER PRIMARY KEY,
                               name TEXT NOT NULL COLLATE NOCASE,
                               sort TEXT COLLATE NOCASE,

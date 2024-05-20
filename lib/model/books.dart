@@ -1,23 +1,22 @@
 // ignore_for_file: non_constant_identifier_names
-import 'package:equatable/equatable.dart';
+
 import 'package:flutibre/model/languages.dart';
 import 'authors.dart';
 import 'comments.dart';
 import 'data.dart';
 import 'database_model.dart';
 
-// ignore: must_be_immutable
-class Books extends Equatable implements DatabaseModel {
+class Books implements DatabaseModel {
   @override
-  int? id;
+  final int? id;
   final String title;
-  final String sort;
-  String timestamp;
-  final String pubdate;
+  final String? sort;
+  final String? timestamp;
+  final String? pubdate;
   final double series_index;
-  final String author_sort;
-  final String isbn;
-  final String lccn;
+  String? author_sort;
+  String? isbn;
+  String lccn;
   final String path;
   final int flags;
   final String uuid;
@@ -36,7 +35,7 @@ class Books extends Equatable implements DatabaseModel {
       this.sort = '',
       this.timestamp = '',
       this.pubdate = '0101-01-01 00:00:00+00:00',
-      this.series_index = 1.0,
+      this.series_index = 1,
       this.author_sort = '',
       this.isbn = '',
       this.lccn = '',
@@ -94,20 +93,4 @@ class Books extends Equatable implements DatabaseModel {
   String toString() {
     return 'Books(id : $id, title : $title, sort : $sort, author_sort : $author_sort, path: $path)';
   }
-
-  @override
-  List<Object?> get props => [
-        title,
-        sort,
-        timestamp,
-        pubdate,
-        series_index,
-        author_sort,
-        isbn,
-        lccn,
-        path,
-        flags,
-        uuid,
-        has_cover
-      ];
 }
