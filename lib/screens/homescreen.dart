@@ -1,10 +1,9 @@
 import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutibre/model/booklist_item.dart';
 import 'package:flutibre/repository/database_handler.dart';
 import 'package:flutter/material.dart';
-//import 'package:pluto_grid/pluto_grid.dart';
+import 'package:pluto_grid/pluto_grid.dart';
 import 'package:provider/provider.dart';
 import 'package:remove_diacritic/remove_diacritic.dart';
 import 'package:uuid/uuid.dart';
@@ -32,12 +31,6 @@ class _HomeScreenState extends State<HomeScreen> {
   var allowedExtensions = ['pdf', 'odt', 'epub', 'mobi'];
 
   @override
-  void initState() {
-    Provider.of<BooksListProvider>(context, listen: false).selectAll();
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Consumer<BooksListProvider>(builder:
         (BuildContext context, BooksListProvider provider, Widget? child) {
@@ -47,15 +40,14 @@ class _HomeScreenState extends State<HomeScreen> {
               shape: const CircleBorder(),
               child: const Icon(Icons.add),
               onPressed: () async {
+                var nav = Navigator.of(context);
                 BookListItem? newBook = await pickfile(provider);
-                // ignore: use_build_context_synchronously
-                Provider.of<BooksListProvider>(context, listen: false)
-                    .insert(newBookListItem: newBook!);
 
                 // ignore: use_build_context_synchronously
-                Navigator.of(context)
-                    .pushNamed('/readpage', arguments: newBook)
-                    .then(
+                await Provider.of<BooksListProvider>(context, listen: false)
+                    .insert(newBookListItem: newBook!);
+
+                nav.pushNamed('/readpage', arguments: newBook).then(
                       (_) => setState(
                         () {
                           Provider.of<BooksListProvider>(context, listen: false)
@@ -69,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
               books = provider.items;
               filteredBooks = filteredBooks.isEmpty ? books : filteredBooks;
               return books.isNotEmpty
-                  ? datatable(filteredBooks)
+                  ? plutoGrid(filteredBooks)
                   : const Center(child: CircularProgressIndicator());
             },
           ));
@@ -205,7 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /* Widget plutoGrid(List<BookListItem> books) {
+  Widget plutoGrid(List<BookListItem> books) {
     late final PlutoGridStateManager stateManager;
 
     final List<PlutoColumn> columns = <PlutoColumn>[
@@ -386,7 +378,7 @@ class _HomeScreenState extends State<HomeScreen> {
               PlutoGridColumnSizeConfig(autoSizeMode: PlutoAutoSizeMode.scale)),
     );
   }
-*/
+
   Future<BookListItem?> pickfile(BooksListProvider provider) async {
     List seq = await databaseHandler.getSqliteSequence();
     int id = seq[0]['seq'] + 1;
@@ -399,12 +391,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
       if (result != null) {
         _pickedfile = result.files.first;
-        String fileName =
-            _pickedfile!.name.substring(0, _pickedfile!.name.lastIndexOf('.'));
+        String fileName = removeDiacritics(
+            _pickedfile!.name.substring(0, _pickedfile!.name.lastIndexOf('.')));
 
         File? newFile = await fileService.copyFile(
             oldpath: _pickedfile!.path!,
-            path: '/home/sire/Sablonok/Ebooks3',
+            path: '/home/sire/Nyilvános/Ebooks2',
             filename: fileName,
             extension: _pickedfile!.extension!);
 
@@ -415,21 +407,98 @@ class _HomeScreenState extends State<HomeScreen> {
           String title = authorTitle['title']!;
           String authorSort = sortingAuthor(authorName);
           String path =
-              '${removeDiacritics(authorName)}/${removeDiacritics(title)}($id)';
+              '${removeDiacritics(authorName).split('&')[0].trim()}/${removeDiacritics(title)}($id)';
           String bookUuid = getUuid();
-          newBookListItem = BookListItem(
-              id: id,
-              authors: authorName,
-              author_sort: authorSort,
-              title: title,
-              path: path,
-              name: _pickedfile!.name,
-              formats: _pickedfile!.extension!,
-              size: _pickedfile!.size,
-              has_cover: 0,
-              timestamp: '${addDateTime.toString().substring(0, 19)}+00:00',
-              last_modified: '${addDateTime.toString().substring(0, 19)}+00:00',
-              uuid: bookUuid);
+
+          Map<String, dynamic> others = {
+            'id': id,
+            'title': title,
+            'authors': authorName,
+            'publisher': 'test',
+            'tags': 'Egy, kettő',
+            'rating': 2.0,
+            'timestamp': '${addDateTime.toString().substring(0, 19)}+00:00',
+            'size': _pickedfile!.size,
+            'comments': 'Ez egy komment',
+            'series': 'Az idő kereke',
+            'series_index': 2.0,
+            'sort': 'idő kereke, Az',
+            'author_sort': authorSort,
+            'formats': _pickedfile!.extension!,
+            'isbn': 'isbn',
+            'path': path,
+            'name': fileName,
+            'lccn': 'lccn',
+            'pubdate': '${addDateTime.toString().substring(0, 19)}+00:00',
+            'last_modified': '${addDateTime.toString().substring(0, 19)}+00:00',
+            'uuid': bookUuid,
+            'has_cover': 0,
+          };
+
+          newBookListItem = BookListItem();
+          if (others['id'] != null) {
+            newBookListItem.id = others['id'];
+          }
+          if (others['title'] != null) {
+            newBookListItem.title = others['title'];
+          }
+          if (others['authors'] != null) {
+            newBookListItem.authors = others['authors'];
+          }
+          if (others['publisher'] != null) {
+            newBookListItem.publisher = others['publisher'];
+          }
+          if (others['rating'] != null) {
+            newBookListItem.rating = others['rating'];
+          }
+          if (others['timestamp'] != null) {
+            newBookListItem.timestamp = others['timestamp'];
+          }
+          if (others['size'] != null) {
+            newBookListItem.size = others['size'];
+          }
+          if (others['tags'] != null) {
+            newBookListItem.tags = others['tags'];
+          }
+          if (others['comments'] != null) {
+            newBookListItem.comments = others['comments'];
+          }
+          if (others['series'] != null) {
+            newBookListItem.series = others['series'];
+          }
+          if (others['series_index'] != null) {
+            newBookListItem.series_index = others['series_index'];
+          }
+          if (others['author_sort'] != null) {
+            newBookListItem.author_sort = others['author_sort'];
+          }
+          if (others['formats'] != null) {
+            newBookListItem.formats = others['formats'];
+          }
+          if (others['isbn'] != null) {
+            newBookListItem.isbn = others['isbn'];
+          }
+          if (others['path'] != null) {
+            newBookListItem.path = others['path'];
+          }
+          if (others['name'] != null) {
+            newBookListItem.name = others['name'];
+          }
+          if (others['lccn'] != null) {
+            newBookListItem.lccn = others['lccn'];
+          }
+          if (others['pubdate'] != null) {
+            newBookListItem.pubdate = others['pubdate'];
+          }
+          if (others['last_modified'] != null) {
+            newBookListItem.last_modified = others['last_modified'];
+          }
+          if (others['uuid'] != null) {
+            newBookListItem.uuid = others['uuid'];
+          }
+          if (others['has_cover'] != null) {
+            newBookListItem.has_cover = others['has_cover'];
+          }
         }
         //fileService.openFile(_pickedfile!.path!);
       } else {

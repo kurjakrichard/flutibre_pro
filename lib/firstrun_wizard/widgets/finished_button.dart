@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_wizard/flutter_wizard.dart';
+import 'package:path/path.dart';
 
 class FinishedButton extends StatelessWidget {
   const FinishedButton({Key? key}) : super(key: key);
@@ -17,14 +18,20 @@ class FinishedButton extends StatelessWidget {
         }
         final enabled = snapshot.data!;
         return ElevatedButton(
-          onPressed: enabled ? _onPressed : null,
+          onPressed: enabled
+              ? () {
+                  _onPressed(context);
+                }
+              : null,
           child: const Text("Finish"),
         );
       },
     );
   }
 
-  void _onPressed() {
+  void _onPressed(context) {
     debugPrint("### Finished!");
+    Navigator.pop(context);
+    Navigator.pushNamed(context, '/homescreen');
   }
 }

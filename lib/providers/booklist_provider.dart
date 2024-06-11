@@ -1,5 +1,7 @@
 import 'package:flutibre/model/booklist_item.dart';
+import 'package:flutibre/model/comments.dart';
 import 'package:flutibre/model/database_model.dart';
+import 'package:flutibre/model/publishers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:remove_diacritic/remove_diacritic.dart';
 import '../model/authors.dart';
@@ -11,18 +13,43 @@ import '../repository/database_handler.dart';
 import '../service/file_service.dart';
 
 class BooksListProvider extends ChangeNotifier {
-  List<BookListItem> items = [];
+  List<BookListItem> _items = [];
   DatabaseHandler databaseHandler = DatabaseHandler();
   FileService fileService = FileService();
 
+  List<BookListItem> get items {
+    return _items;
+  }
+
   Future<void> selectAll() async {
-    items = await databaseHandler.getBookItemList();
+    _items = await databaseHandler.getBookItemList();
     notifyListeners();
   }
 
   Future insert({required BookListItem newBookListItem}) async {
-    //Authors item = Authors(name: author.name, sort: author.name);
-    //databaseHandler.insert(table: 'authors', item: item);
+    List<String> authorsList = newBookListItem.authors.split('&');
+    //Authors author = Authors(
+    //  name: newBookListItem.authors, sort: newBookListItem.author_sort);
+
+    List<int> authorsIds = [];
+
+    for (String author in authorsList) {
+      List<int> checkAuthors = (await databaseHandler.selectIdsByField(
+          table: 'authors',
+          type: 'Authors',
+          field: 'name',
+          searchItem: author.trim()));
+      bool authorNotExist = checkAuthors.isEmpty;
+      if (authorNotExist) {
+        int authorId = await databaseHandler.insert(
+          table: 'authors',
+          item: Authors(name: author.trim(), sort: 'sort'),
+        );
+        authorsIds.add(authorId);
+      } else {
+        authorsIds = [...authorsIds, ...checkAuthors];
+      }
+    }
 
     Books newBook = Books(
         id: newBookListItem.id,
@@ -31,24 +58,23 @@ class BooksListProvider extends ChangeNotifier {
         sort: newBookListItem.title,
         author_sort: newBookListItem.author_sort,
         path: newBookListItem.path,
+        isbn: newBookListItem.isbn,
+        lccn: newBookListItem.lccn,
         has_cover: newBookListItem.has_cover,
         timestamp: newBookListItem.timestamp,
         last_modified: newBookListItem.last_modified);
 
     Data data = Data(
-        name:
-            '${removeDiacritics(newBookListItem.title)} - ${removeDiacritics(newBookListItem.authors)}',
+        name: newBookListItem.name,
         book: newBookListItem.id,
         uncompressed_size: newBookListItem.size,
         format: newBookListItem.formats);
 
-    Authors author = Authors(
-        name: newBookListItem.authors, sort: newBookListItem.author_sort);
     await fileService.copyFile(
-        oldpath: '/home/sire/Sablonok/Ebooks3/${newBookListItem.name}',
-        path: '/home/sire/Sablonok/Ebooks3/${newBookListItem.path}',
-        filename:
-            '${removeDiacritics(newBookListItem.title)} - ${removeDiacritics(newBookListItem.authors)}',
+        oldpath:
+            '/home/sire/Nyilvános/Ebooks2/${newBookListItem.name}.${newBookListItem.formats}',
+        path: '/home/sire/Nyilvános/Ebooks2/${newBookListItem.path}',
+        filename: newBookListItem.name,
         extension: newBookListItem.formats);
 
     int bookId = await databaseHandler.insert(
@@ -62,26 +88,18 @@ class BooksListProvider extends ChangeNotifier {
       item: data,
     );
 
-    List<DatabaseModel> checkAuthors =
-        (await databaseHandler.selectItemsByField(
-                table: 'authors',
-                type: 'Authors',
-                field: 'name',
-                searchItem: author.name))
-            .cast<Authors>();
+    if (newBookListItem.comments != null || newBookListItem.comments != '') {
+      Comments comment =
+          Comments(book: bookId, text: newBookListItem.comments!);
+      await databaseHandler.insert(table: 'comments', item: comment);
+    }
 
-    bool authorExist = checkAuthors.isEmpty;
-
-    int authorId = authorExist
-        ? await databaseHandler.insert(
-            table: 'authors',
-            item: author,
-          )
-        : checkAuthors[0].id;
-    await databaseHandler.insert(
-      table: 'books_authors_link',
-      item: BooksAuthorsLink(book: bookId, author: authorId),
-    );
+    for (int id in authorsIds) {
+      await databaseHandler.insert(
+        table: 'books_authors_link',
+        item: BooksAuthorsLink(book: bookId, author: id),
+      );
+    }
 
     selectAll();
     notifyListeners();

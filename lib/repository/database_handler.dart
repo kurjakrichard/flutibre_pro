@@ -247,6 +247,29 @@ class DatabaseHandler {
   }
 
   // Fetch Operation: Get item from database by field
+  Future<List<int>> selectIdsByField(
+      {required String table,
+      required String type,
+      required String field,
+      required String searchItem}) async {
+    final db = await database;
+    int item;
+    List<int> items = [];
+    List<Map<String, dynamic>> itemMap =
+        await db.rawQuery('SELECT id FROM $table WHERE $field=?', [searchItem]);
+
+    if (itemMap.isEmpty) {
+      return [];
+    }
+    for (var element in itemMap) {
+      item = element['id'];
+
+      items.add(item);
+    }
+    return items;
+  }
+
+  // Fetch Operation: Get item from database by field
   Future<List<DatabaseModel>> selectItemsByField(
       {required String table,
       required String type,
@@ -255,8 +278,8 @@ class DatabaseHandler {
     final db = await database;
     DatabaseModel? item;
     List<DatabaseModel> items = [];
-    List<Map<String, dynamic>> itemMap = await db.query(table,
-        where: '$field = ?', whereArgs: [searchItem], limit: 1);
+    List<Map<String, dynamic>> itemMap =
+        await db.query(table, where: '$field = ?', whereArgs: [searchItem]);
 
     if (itemMap.isEmpty) {
       return [];

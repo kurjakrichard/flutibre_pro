@@ -82,6 +82,7 @@ class _EditScreenState extends State<EditScreen> {
                     oldBookListItem != newBookListItem) {
                   Books newBook = Books(
                       id: newBookListItem.id,
+                      path: newBookListItem.path,
                       title: newBookListItem.title,
                       uuid: oldBookListItem!.uuid);
                   Provider.of<BooksListProvider>(context, listen: false).update(

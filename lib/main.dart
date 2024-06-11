@@ -1,3 +1,4 @@
+import 'package:flutibre/firstrun_wizard/wizard.dart';
 import 'package:flutibre/screens/editscreen.dart';
 import 'package:flutibre/widgets/theme.dart';
 import 'package:flutter/material.dart';
@@ -19,13 +20,16 @@ class Flutibre extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => BooksListProvider())
+        ChangeNotifierProvider(
+            create: (context) => BooksListProvider()..selectAll())
       ],
       builder: (context, child) => MaterialApp(
         theme: baseTheme,
         initialRoute: '/',
         routes: {
           '/': (context) => const HomeScreen(),
+          //'/': (context) => FirstRunWizard.provider(),
+          '/homescreen': (context) => const HomeScreen(),
           '/addpage': (context) => const EditScreen(
                 title: 'Add Item',
                 buttonText: 'Insert',

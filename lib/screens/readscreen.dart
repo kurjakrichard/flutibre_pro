@@ -1,9 +1,7 @@
 import 'dart:io';
-
 import 'package:epub_view/epub_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show SystemChrome, SystemUiOverlayStyle;
-
 import '../model/booklist_item.dart';
 
 class ReadScreen extends StatefulWidget {
@@ -14,7 +12,7 @@ class ReadScreen extends StatefulWidget {
 }
 
 class _ReadScreenState extends State<ReadScreen> with WidgetsBindingObserver {
-  BookListItem? oldBookListItem;
+  BookListItem? bookListItem;
 
   @override
   void initState() {
@@ -62,9 +60,11 @@ class _ReadScreenState extends State<ReadScreen> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     var routeSettings = ModalRoute.of(context)!.settings;
-    oldBookListItem = routeSettings.arguments as BookListItem;
+    bookListItem = routeSettings.arguments as BookListItem;
+
     File book = File(
-        '/home/sire/Sablonok/Ebooks3/${oldBookListItem!.path}/${oldBookListItem!.name}');
+        '/home/sire/Nyilvános/Ebooks2/${bookListItem!.path}/${bookListItem!.name}.${bookListItem!.formats}');
+
     _epubReaderController = EpubController(
       document: EpubDocument.openFile(book),
     );

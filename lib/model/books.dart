@@ -8,44 +8,35 @@ import 'database_model.dart';
 
 class Books implements DatabaseModel {
   @override
-  final int? id;
-  final String title;
-  final String? sort;
-  final String? timestamp;
-  final String? pubdate;
-  final double series_index;
+  int? id;
+  String title;
+  String? sort;
+  String? timestamp;
+  String? pubdate;
+  double series_index;
   String? author_sort;
   String? isbn;
   String lccn;
-  final String path;
-  final int flags;
-  final String uuid;
-  final int has_cover;
-  final String last_modified;
-  //Related classes
-  Comments? comment;
-  List<Data>? formats;
-  List<Authors>? authors;
-  List<Languages>? languages;
-  List<Data>? datas;
+  String path;
+  int flags;
+  String uuid;
+  int has_cover;
+  String last_modified;
 
   Books(
       {this.id,
       this.title = '',
-      this.sort = '',
-      this.timestamp = '',
-      this.pubdate = '0101-01-01 00:00:00+00:00',
+      this.sort,
+      this.timestamp,
+      this.pubdate,
       this.series_index = 1,
-      this.author_sort = '',
-      this.isbn = '',
+      this.author_sort,
+      this.isbn,
       this.lccn = '',
-      this.path = '',
+      required this.path,
       this.flags = 1,
-      this.has_cover = 1,
-      this.last_modified = '',
-      this.formats,
-      this.authors,
-      this.comment,
+      this.has_cover = 0,
+      this.last_modified = '2000-01-01 00:00:00+00:00',
       required this.uuid});
 
   //Convert a Map object to a model object
@@ -75,8 +66,6 @@ class Books implements DatabaseModel {
     }
     map['title'] = title;
     map['sort'] = sort;
-    map['timestamp'] = timestamp;
-    map['pubdate'] = pubdate;
     map['series_index'] = series_index;
     map['author_sort'] = author_sort;
     map['isbn'] = isbn;
