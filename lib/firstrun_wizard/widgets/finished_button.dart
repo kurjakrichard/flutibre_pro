@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_wizard/flutter_wizard.dart';
-import 'package:path/path.dart';
 
 class FinishedButton extends StatelessWidget {
   const FinishedButton({Key? key}) : super(key: key);

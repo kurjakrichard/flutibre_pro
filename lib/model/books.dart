@@ -1,9 +1,5 @@
 // ignore_for_file: non_constant_identifier_names
 
-import 'package:flutibre/model/languages.dart';
-import 'authors.dart';
-import 'comments.dart';
-import 'data.dart';
 import 'database_model.dart';
 
 class Books implements DatabaseModel {

@@ -58,6 +58,7 @@ flutter:
   assets:
     - images/bookshelf-icon2.png
     - images/cover.png
+    - images/flutibre-logo.png
     - assets/books/
     - assets/books/Richard Kurjak/ 
     - assets/books/Richard Kurjak/Flutibre user manual (1)/

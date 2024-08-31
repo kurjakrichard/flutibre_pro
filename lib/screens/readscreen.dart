@@ -34,6 +34,7 @@ class _ReadScreenState extends State<ReadScreen> with WidgetsBindingObserver {
   }
 
   Brightness get platformBrightness =>
+      // ignore: deprecated_member_use
       MediaQueryData.fromView(WidgetsBinding.instance.window)
           .platformBrightness;
 
@@ -67,6 +68,7 @@ class _ReadScreenState extends State<ReadScreen> with WidgetsBindingObserver {
 
     _epubReaderController = EpubController(
       document: EpubDocument.openFile(book),
+      epubCfi: 'epubcfi(/6/6[chapter-2]!/4/2/1612)',
     );
     return Scaffold(
       appBar: AppBar(
@@ -78,6 +80,14 @@ class _ReadScreenState extends State<ReadScreen> with WidgetsBindingObserver {
           ),
         ),
         actions: <Widget>[
+          Builder(builder: (context) {
+            return IconButton(
+                icon: const Icon(Icons.menu),
+                color: Colors.white,
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                });
+          }),
           IconButton(
             icon: const Icon(Icons.save_alt),
             color: Colors.white,
@@ -85,7 +95,9 @@ class _ReadScreenState extends State<ReadScreen> with WidgetsBindingObserver {
           ),
         ],
       ),
-      //drawer: Drawer(child: EpubViewTableOfContents(controller: _epubReaderController),),
+      endDrawer: Drawer(
+        child: EpubViewTableOfContents(controller: _epubReaderController),
+      ),
       body: EpubView(
         builders: EpubViewBuilders<DefaultBuilderOptions>(
           options: const DefaultBuilderOptions(),

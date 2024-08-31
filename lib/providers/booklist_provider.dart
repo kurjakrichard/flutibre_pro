@@ -1,9 +1,6 @@
 import 'package:flutibre/model/booklist_item.dart';
 import 'package:flutibre/model/comments.dart';
-import 'package:flutibre/model/database_model.dart';
-import 'package:flutibre/model/publishers.dart';
 import 'package:flutter/foundation.dart';
-import 'package:remove_diacritic/remove_diacritic.dart';
 import '../model/authors.dart';
 import '../model/books.dart';
 import '../model/books_authors_link.dart';
@@ -101,12 +98,12 @@ class BooksListProvider extends ChangeNotifier {
       );
     }
 
-    selectAll();
+    await selectAll();
     notifyListeners();
   }
 
   void delete(int id) async {
-    var databaseHandler = DatabaseHandler();
+    //var databaseHandler = DatabaseHandler();
     await databaseHandler.delete('books', id);
     selectAll();
     notifyListeners();

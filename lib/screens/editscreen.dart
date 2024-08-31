@@ -43,6 +43,14 @@ class _EditScreenState extends State<EditScreen> {
       appBar: AppBar(
         title: Text(widget.title),
         actions: [
+          IconButton(
+            tooltip: 'Read book',
+            icon: const Icon(Icons.menu_book),
+            onPressed: () {
+              Navigator.of(context)
+                  .pushNamed('/readpage', arguments: oldBookListItem);
+            },
+          ),
           route != '/addpage'
               ? IconButton(
                   tooltip: 'Delete book',
@@ -94,6 +102,7 @@ class _EditScreenState extends State<EditScreen> {
                 } else if (route == '/addpage') {
                   String authorSort = sortingAuthor(_authorController.text);
                   DateTime addDateTime = DateTime.now();
+                  // ignore: unused_local_variable
                   Books newBook = Books(
                     id: newBookListItem.id,
                     title: newBookListItem.title,
@@ -106,6 +115,7 @@ class _EditScreenState extends State<EditScreen> {
                     last_modified:
                         '${addDateTime.toString().substring(0, 19)}+00:00',
                   );
+                  // ignore: unused_local_variable
                   Authors author =
                       Authors(name: _authorController.text, sort: authorSort);
                   Provider.of<BooksListProvider>(context, listen: false)

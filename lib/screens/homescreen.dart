@@ -61,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
               books = provider.items;
               filteredBooks = filteredBooks.isEmpty ? books : filteredBooks;
               return books.isNotEmpty
-                  ? plutoGrid(filteredBooks)
+                  ? list(filteredBooks)
                   : const Center(child: CircularProgressIndicator());
             },
           ));

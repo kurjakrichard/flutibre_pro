@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import 'providers/booklist_provider.dart';
 import 'screens/homescreen.dart';
 import 'screens/readscreen.dart';
+// ignore: unused_import
+import 'screens/splashscreen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,7 +29,7 @@ class Flutibre extends StatelessWidget {
         theme: baseTheme,
         initialRoute: '/',
         routes: {
-          '/': (context) => const HomeScreen(),
+          '/': (context) => const SplashScreen(),
           //'/': (context) => FirstRunWizard.provider(),
           '/homescreen': (context) => const HomeScreen(),
           '/addpage': (context) => const EditScreen(

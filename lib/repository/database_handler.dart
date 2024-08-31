@@ -7,6 +7,7 @@ import 'package:flutibre/model/identifiers.dart';
 import 'package:flutibre/model/languages.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import '../model/booklist_item.dart';
 import '../model/books.dart';
@@ -48,9 +49,9 @@ class DatabaseHandler {
   Future<Database> initDB() async {
     sqfliteFfiInit();
     final databaseFactory = databaseFactoryFfi;
-    //final appDocumentsDir = await getApplicationDocumentsDirectory();
-    //final dbPath = join(appDocumentsDir.path, "databases", "$db.db");
-    const dbPath = "/home/sire/Nyilvános/Ebooks2/metadata.db";
+    final appDocumentsDir = await getApplicationDocumentsDirectory();
+    final dbPath = join(appDocumentsDir.path, "databases", "$db.db");
+    //const dbPath = "/home/sire/Nyilvános/Ebooks2/metadata.db";
     final database = await databaseFactory.openDatabase(
       dbPath,
       options: OpenDatabaseOptions(
