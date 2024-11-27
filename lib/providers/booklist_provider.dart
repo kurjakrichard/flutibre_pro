@@ -19,7 +19,7 @@ class BooksListProvider extends ChangeNotifier {
   }
 
   Future<void> selectAll() async {
-    _items = await databaseHandler.getBookItemList();
+    _items = await databaseHandler.getBookListItemList();
     notifyListeners();
   }
 
@@ -29,7 +29,7 @@ class BooksListProvider extends ChangeNotifier {
     //  name: newBookListItem.authors, sort: newBookListItem.author_sort);
 
     List<int> authorsIds = [];
-
+//TODO Triggereket hozzáadni
     for (String author in authorsList) {
       List<int> checkAuthors = (await databaseHandler.selectIdsByField(
           table: 'authors',
@@ -75,10 +75,10 @@ class BooksListProvider extends ChangeNotifier {
         extension: newBookListItem.formats);
 
     int bookId = await databaseHandler.insert(
-      dropTrigger: 'insert',
+      dropTrigger: 'dropTriggerInsertBook',
       table: 'books',
       item: newBook,
-      createTrigger: 'createinsert',
+      createTrigger: 'createTriggerInsertBook',
     );
     await databaseHandler.insert(
       table: 'data',

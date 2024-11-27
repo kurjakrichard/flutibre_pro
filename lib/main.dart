@@ -29,8 +29,8 @@ class Flutibre extends StatelessWidget {
         theme: baseTheme,
         initialRoute: '/',
         routes: {
-          '/': (context) => const SplashScreen(),
-          //'/': (context) => FirstRunWizard.provider(),
+          //'/': (context) => const SplashScreen(),
+          '/': (context) => FirstRunWizard.provider(),
           '/homescreen': (context) => const HomeScreen(),
           '/addpage': (context) => const EditScreen(
                 title: 'Add Item',

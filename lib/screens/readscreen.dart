@@ -57,6 +57,7 @@ class _ReadScreenState extends State<ReadScreen> with WidgetsBindingObserver {
   }
 
   late EpubController _epubReaderController;
+  final GlobalKey<ScaffoldState> _key = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +72,7 @@ class _ReadScreenState extends State<ReadScreen> with WidgetsBindingObserver {
       epubCfi: 'epubcfi(/6/6[chapter-2]!/4/2/1612)',
     );
     return Scaffold(
+      key: _key,
       appBar: AppBar(
         title: EpubViewActualChapter(
           controller: _epubReaderController,
@@ -85,7 +87,11 @@ class _ReadScreenState extends State<ReadScreen> with WidgetsBindingObserver {
                 icon: const Icon(Icons.menu),
                 color: Colors.white,
                 onPressed: () {
-                  Scaffold.of(context).openDrawer();
+                  _key.currentState?.openEndDrawer();
+                  if (_key.currentState!.isDrawerOpen) {
+                    _key.currentState!.openEndDrawer();
+                  }
+                  //  _key.currentState?.closeDrawer();
                 });
           }),
           IconButton(

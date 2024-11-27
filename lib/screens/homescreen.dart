@@ -381,7 +381,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<BookListItem?> pickfile(BooksListProvider provider) async {
     List seq = await databaseHandler.getSqliteSequence();
-    int id = seq[0]['seq'] + 1;
+    int id;
+    try {
+      id = seq[0]['seq'] + 1;
+    } catch (e) {
+      id = 1;
+    }
+
     BookListItem newBookListItem = BookListItem();
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
