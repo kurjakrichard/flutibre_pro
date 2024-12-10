@@ -1,39 +1,39 @@
 // ignore_for_file: must_be_immutable
 import 'package:equatable/equatable.dart';
-import 'database_model.dart';
+import 'books_model.dart';
 
-class BooksRatingsLink extends Equatable implements DatabaseModel {
+class BooksTagsLink extends Equatable implements BooksModel {
   @override
   int? id;
   final int book;
-  final int rating;
+  final int tag;
 
-  BooksRatingsLink({this.id, required this.book, required this.rating});
+  BooksTagsLink({this.id, required this.book, required this.tag});
 
   //Convert a Map object to a model object
   @override
-  BooksRatingsLink.fromMap(Map<String, dynamic> res)
+  BooksTagsLink.fromJson(Map<String, dynamic> res)
       : id = res['id'],
         book = res['book'],
-        rating = res['rating'];
+        tag = res['tag'];
 
   //Convert a model object to a Map opject
   @override
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     Map<String, dynamic> map = <String, dynamic>{};
     if (id != null) {
       map['id'] = id;
     }
     map['book'] = book;
-    map['rating'] = rating;
+    map['tag'] = tag;
     return map;
   }
 
   @override
   String toString() {
-    return 'BooksRatingsLink(id : $id, book : $book, rating : $rating)';
+    return 'BooksTagsLink(id : $id, book : $book, tag : $tag)';
   }
 
   @override
-  List<Object?> get props => [book, rating];
+  List<Object?> get props => [book, tag];
 }

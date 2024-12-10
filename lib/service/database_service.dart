@@ -1,8 +1,8 @@
-import '../model/authors.dart';
-import '../model/books.dart';
-import '../model/books_authors_link.dart';
-import '../model/data.dart';
-import '../model/database_model.dart';
+import '../models/authors.dart';
+import '../models/books.dart';
+import '../models/books_authors_link.dart';
+import '../models/data.dart';
+import '../models/books_model.dart';
 import '../repository/database_handler.dart';
 
 class DatabaseService {
@@ -49,13 +49,12 @@ class DatabaseService {
       item: data,
     );
 
-    List<DatabaseModel> checkAuthors =
-        (await databaseHandler.selectItemsByField(
-                table: 'authors',
-                type: 'Authors',
-                field: 'name',
-                searchItem: author.name))
-            .cast<Authors>();
+    List<BooksModel> checkAuthors = (await databaseHandler.selectItemsByField(
+            table: 'authors',
+            type: 'Authors',
+            field: 'name',
+            searchItem: author.name))
+        .cast<Authors>();
 
     bool authorExist = checkAuthors.isEmpty;
 

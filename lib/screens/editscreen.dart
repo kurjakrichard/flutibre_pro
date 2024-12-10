@@ -1,6 +1,6 @@
-import 'package:flutibre/model/booklist_item.dart';
-import 'package:flutibre/model/books.dart';
-import 'package:flutibre/model/authors.dart';
+import 'package:flutibre/models/booklist_item.dart';
+import 'package:flutibre/models/books.dart';
+import 'package:flutibre/models/authors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/booklist_provider.dart';

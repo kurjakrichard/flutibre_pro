@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutibre/model/booklist_item.dart';
+import 'package:flutibre/models/authors.dart';
+import 'package:flutibre/models/booklist_item.dart';
 import 'package:flutibre/repository/database_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:pluto_grid/pluto_grid.dart';
@@ -47,14 +48,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 await Provider.of<BooksListProvider>(context, listen: false)
                     .insert(newBookListItem: newBook!);
 
-                nav.pushNamed('/readpage', arguments: newBook).then(
+                /*     nav.pushNamed('/readpage', arguments: newBook).then(
                       (_) => setState(
                         () {
                           Provider.of<BooksListProvider>(context, listen: false)
                               .selectAll();
                         },
                       ),
-                    );
+                    );*/
               }),
           body: Consumer<BooksListProvider>(
             builder: (context, provider, child) {

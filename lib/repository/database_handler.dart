@@ -1,40 +1,15 @@
 import 'dart:io';
-import 'package:flutibre/model/authors.dart';
-import 'package:flutibre/model/comments.dart';
-import 'package:flutibre/model/data.dart';
-import 'package:flutibre/model/database_model.dart';
-import 'package:flutibre/model/identifiers.dart';
-import 'package:flutibre/model/languages.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import '../model/booklist_item.dart';
-import '../model/books.dart';
-import '../model/books_authors_link.dart';
-import '../model/books_languages_link.dart';
-import '../model/books_publishers_link.dart';
-import '../model/books_ratings_link.dart';
-import '../model/books_series_link.dart';
-import '../model/books_tags_link.dart';
+import '../models/models.dart';
 
 class DatabaseHandler {
   static DatabaseHandler? _databaseHandler;
   static Database? _database;
   final String db = 'metadata';
-
-  Map<String, String> triggers = <String, String>{
-    'dropTriggerInsertBook': 'DROP TRIGGER books_insert_trg',
-    'dropTriggerUpdateBook': 'DROP TRIGGER books_update_trg',
-    'createTriggerInsertBook':
-        '''CREATE TRIGGER books_insert_trg AFTER INSERT ON books
-          BEGIN UPDATE books SET sort=title_sort(NEW.title),uuid=uuid4()
-          WHERE id=NEW.id; END''',
-    'updateTriggerInsertBook':
-        '''CREATE TRIGGER books_update_trg AFTER UPDATE ON books 
-            BEGIN UPDATE books SET sort=title_sort(NEW.title) 
-            WHERE id=NEW.id AND OLD.title NEW.title; END'''
-  };
+  String? dbPath;
 
   DatabaseHandler._createInstance();
 
@@ -52,15 +27,11 @@ class DatabaseHandler {
     sqfliteFfiInit();
     final DatabaseFactory databaseFactory = databaseFactoryFfi;
     final Directory appDocumentsDir = await getApplicationDocumentsDirectory();
-    final String dbPath =
-        path.join(appDocumentsDir.path, "databases", "$db.db");
-    /* final String calnotesPath =
-        path.join(appDocumentsDir.path, "databases/.calnotes");
-        */
+    dbPath = path.join(appDocumentsDir.path, "databases", "$db.db");
 
     //const dbPath = "/home/sire/Nyilvános/Ebooks2/metadata.db";
     final Database database = await databaseFactory.openDatabase(
-      dbPath,
+      dbPath!,
       options: OpenDatabaseOptions(
         version: 1,
         onCreate: _onCreate,
@@ -93,7 +64,7 @@ class DatabaseHandler {
 
     if (resultSet.isNotEmpty) {
       for (var item in resultSet) {
-        BookListItem bookListItem = BookListItem.fromMap(item);
+        BookListItem bookListItem = BookListItem.fromJson(item);
         bookListItems.add(bookListItem);
       }
       return bookListItems;
@@ -122,7 +93,7 @@ class DatabaseHandler {
     List<BookListItem> bookListItems = <BookListItem>[];
 
     if (resultSet.isNotEmpty) {
-      BookListItem bookListItem = BookListItem.fromMap(resultSet[0]);
+      BookListItem bookListItem = BookListItem.fromJson(resultSet[0]);
       bookListItems.add(bookListItem);
 
       return bookListItem;
@@ -132,10 +103,9 @@ class DatabaseHandler {
   }
 
   // Fetch Operation: Get item from database by id
-  Future<DatabaseModel?> selectItemById(
-      String table, String type, int id) async {
+  Future<BooksModel?> selectItemById(String table, String type, int id) async {
     final db = await database;
-    DatabaseModel? item;
+    BooksModel? item;
     List<Map<String, dynamic>> itemMap =
         await db.query(table, where: 'id = ?', whereArgs: [id], limit: 1);
     if (itemMap.isEmpty) {
@@ -144,40 +114,40 @@ class DatabaseHandler {
     for (var element in itemMap) {
       switch (type) {
         case 'Authors':
-          item = Authors.fromMap(element);
+          item = Authors.fromJson(element);
           break;
         case 'BooksAuthorsLink':
-          item = BooksAuthorsLink.fromMap(element);
+          item = BooksAuthorsLink.fromJson(element);
           break;
         case 'BooksLanguagesLink':
-          item = BooksLanguagesLink.fromMap(element);
+          item = BooksLanguagesLink.fromJson(element);
           break;
         case 'BooksPublishersLink':
-          item = BooksPublishersLink.fromMap(element);
+          item = BooksPublishersLink.fromJson(element);
           break;
         case 'BooksRatingsLink':
-          item = BooksRatingsLink.fromMap(element);
+          item = BooksRatingsLink.fromJson(element);
           break;
         case 'BooksSeriesLink':
-          item = BooksSeriesLink.fromMap(element);
+          item = BooksSeriesLink.fromJson(element);
           break;
         case 'BooksTagsLink':
-          item = BooksTagsLink.fromMap(element);
+          item = BooksTagsLink.fromJson(element);
           break;
         case 'Books':
-          item = Books.fromMap(element);
+          item = Books.fromJson(element);
           break;
         case 'Comments':
-          item = Comments.fromMap(element);
+          item = Comments.fromJson(element);
           break;
         case 'Data':
-          item = Data.fromMap(element);
+          item = Data.fromJson(element);
           break;
         case 'Identifiers':
-          item = Identifiers.fromMap(element);
+          item = Identifiers.fromJson(element);
           break;
         case 'Languages':
-          item = Languages.fromMap(element);
+          item = Languages.fromJson(element);
           break;
         default:
           item = null;
@@ -187,14 +157,14 @@ class DatabaseHandler {
   }
 
   // Fetch Operation: Get item from database by linktable and bookid
-  Future<List<DatabaseModel?>> selectItemByLink(
+  Future<List<BooksModel?>> selectItemByLink(
       {required String table,
       required String linkTable,
       required String type,
       required String field,
       required int bookId}) async {
     final db = await database;
-    DatabaseModel? item;
+    BooksModel? item;
 
     var items = [];
     List<Map<String, dynamic>> itemMap = await db.query(
@@ -213,40 +183,40 @@ class DatabaseHandler {
     for (var element in itemMap) {
       switch (type) {
         case 'Authors':
-          item = Authors.fromMap(element);
+          item = Authors.fromJson(element);
           break;
         case 'BooksAuthorsLink':
-          item = BooksAuthorsLink.fromMap(element);
+          item = BooksAuthorsLink.fromJson(element);
           break;
         case 'BooksLanguagesLink':
-          item = BooksLanguagesLink.fromMap(element);
+          item = BooksLanguagesLink.fromJson(element);
           break;
         case 'BooksPublishersLink':
-          item = BooksPublishersLink.fromMap(element);
+          item = BooksPublishersLink.fromJson(element);
           break;
         case 'BooksRatingsLink':
-          item = BooksRatingsLink.fromMap(element);
+          item = BooksRatingsLink.fromJson(element);
           break;
         case 'BooksSeriesLink':
-          item = BooksSeriesLink.fromMap(element);
+          item = BooksSeriesLink.fromJson(element);
           break;
         case 'BooksTagsLink':
-          item = BooksTagsLink.fromMap(element);
+          item = BooksTagsLink.fromJson(element);
           break;
         case 'Books':
-          item = Books.fromMap(element);
+          item = Books.fromJson(element);
           break;
         case 'Comments':
-          item = Comments.fromMap(element);
+          item = Comments.fromJson(element);
           break;
         case 'Data':
-          item = Data.fromMap(element);
+          item = Data.fromJson(element);
           break;
         case 'Identifiers':
-          item = Identifiers.fromMap(element);
+          item = Identifiers.fromJson(element);
           break;
         case 'Languages':
-          item = Languages.fromMap(element);
+          item = Languages.fromJson(element);
           break;
         default:
           item = null;
@@ -254,7 +224,7 @@ class DatabaseHandler {
       items.add(item);
     }
 
-    return items as Future<List<DatabaseModel?>>;
+    return items as Future<List<BooksModel?>>;
   }
 
   // Fetch Operation: Get item from database by field
@@ -281,14 +251,14 @@ class DatabaseHandler {
   }
 
   // Fetch Operation: Get item from database by field
-  Future<List<DatabaseModel>> selectItemsByField(
+  Future<List<BooksModel>> selectItemsByField(
       {required String table,
       required String type,
       required String field,
       required String searchItem}) async {
     final db = await database;
-    DatabaseModel? item;
-    List<DatabaseModel> items = [];
+    BooksModel? item;
+    List<BooksModel> items = [];
     List<Map<String, dynamic>> itemMap =
         await db.query(table, where: '$field = ?', whereArgs: [searchItem]);
 
@@ -298,40 +268,40 @@ class DatabaseHandler {
     for (var element in itemMap) {
       switch (type) {
         case 'Authors':
-          item = Authors.fromMap(element);
+          item = Authors.fromJson(element);
           break;
         case 'BooksAuthorsLink':
-          item = BooksAuthorsLink.fromMap(element);
+          item = BooksAuthorsLink.fromJson(element);
           break;
         case 'BooksLanguagesLink':
-          item = BooksLanguagesLink.fromMap(element);
+          item = BooksLanguagesLink.fromJson(element);
           break;
         case 'BooksPublishersLink':
-          item = BooksPublishersLink.fromMap(element);
+          item = BooksPublishersLink.fromJson(element);
           break;
         case 'BooksRatingsLink':
-          item = BooksRatingsLink.fromMap(element);
+          item = BooksRatingsLink.fromJson(element);
           break;
         case 'BooksSeriesLink':
-          item = BooksSeriesLink.fromMap(element);
+          item = BooksSeriesLink.fromJson(element);
           break;
         case 'BooksTagsLink':
-          item = BooksTagsLink.fromMap(element);
+          item = BooksTagsLink.fromJson(element);
           break;
         case 'Books':
-          item = Books.fromMap(element);
+          item = Books.fromJson(element);
           break;
         case 'Comments':
-          item = Comments.fromMap(element);
+          item = Comments.fromJson(element);
           break;
         case 'Data':
-          item = Data.fromMap(element);
+          item = Data.fromJson(element);
           break;
         case 'Identifiers':
-          item = Identifiers.fromMap(element);
+          item = Identifiers.fromJson(element);
           break;
         case 'Languages':
-          item = Languages.fromMap(element);
+          item = Languages.fromJson(element);
           break;
         default:
           item = null;
@@ -353,19 +323,19 @@ class DatabaseHandler {
     try {
       if (dropTrigger != null) {
         try {
-          db.execute(triggers[dropTrigger]!);
+          db.execute(dropTrigger);
         } catch (e) {
           throw Exception('Some error$e');
         }
       }
 
-      result = await db.insert(table, item.toMap());
+      result = await db.insert(table, item.toJson());
     } catch (e) {
       throw Exception('Some error$e');
     } finally {
       if (createTrigger != null) {
         try {
-          db.execute(triggers[createTrigger]!);
+          db.execute(createTrigger);
         } catch (e) {
           throw Exception('Some error$e');
         }
@@ -391,7 +361,7 @@ class DatabaseHandler {
           throw Exception('Some error$e');
         }
       }
-      result = await db.update(table, item.toMap(),
+      result = await db.update(table, item.toJson(),
           where: 'id = ?',
           whereArgs: [id],
           conflictAlgorithm: ConflictAlgorithm.replace);
@@ -431,12 +401,14 @@ class DatabaseHandler {
       // Extract the pre-populated database file from assets
       final blob = await rootBundle.load(path.join(filepath, 'metadata.db'));
       final buffer = blob.buffer;
+
       await file.writeAsBytes(
           buffer.asUint8List(blob.offsetInBytes, blob.lengthInBytes));
     }
   }
 
-  void copyDirectorySync(Directory source, Directory destination) {
+  Future<void> copyDirectorySync(
+      Directory source, Directory destination) async {
     /// create destination folder if not exist
     if (!destination.existsSync()) {
       destination.createSync(recursive: true);
@@ -457,8 +429,10 @@ class DatabaseHandler {
 
   // This creates tables in our database.
   Future<void> _onCreate(Database database, int version) async {
+    await copyDirectorySync(Directory('assets/books'), Directory(dbPath!));
     final db = database;
-    await db.execute("""
+
+    /*  await db.execute("""
 CREATE TABLE authors ( id   INTEGER PRIMARY KEY,
                               name TEXT NOT NULL COLLATE NOCASE,
                               sort TEXT COLLATE NOCASE,
@@ -1100,5 +1074,6 @@ CREATE TRIGGER series_update_trg
           UPDATE series SET sort=title_sort(NEW.name) WHERE id=NEW.id;
         END;
  """);
+ */
   }
 }

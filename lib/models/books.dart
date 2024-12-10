@@ -1,8 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
+import 'books_model.dart';
 
-import 'database_model.dart';
-
-class Books implements DatabaseModel {
+class Books implements BooksModel {
   @override
   int? id;
   String title;
@@ -37,7 +36,7 @@ class Books implements DatabaseModel {
 
   //Convert a Map object to a model object
   @override
-  Books.fromMap(Map<String, dynamic> res)
+  Books.fromJson(Map<String, dynamic> res)
       : id = res['id'],
         title = res['title'],
         sort = res['sort'],
@@ -55,7 +54,7 @@ class Books implements DatabaseModel {
 
   //Convert a model object to a Map opject
   @override
-  Map<String, Object?> toMap() {
+  Map<String, Object?> toJson() {
     Map<String, dynamic> map = <String, dynamic>{};
     if (id != null) {
       map['id'] = id;

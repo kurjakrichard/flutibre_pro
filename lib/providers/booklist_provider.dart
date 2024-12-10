@@ -1,17 +1,21 @@
-import 'package:flutibre/model/booklist_item.dart';
-import 'package:flutibre/model/comments.dart';
+import 'package:flutibre/constants/constants.dart';
+import 'package:flutibre/models/booklist_item.dart';
+import 'package:flutibre/models/comments.dart';
+import 'package:flutibre/repository/database_handler_calnotes.dart';
 import 'package:flutter/foundation.dart';
-import '../model/authors.dart';
-import '../model/books.dart';
-import '../model/books_authors_link.dart';
-import '../model/data.dart';
+import '../models/authors.dart';
+import '../models/books.dart';
+import '../models/books_authors_link.dart';
+import '../models/data.dart';
 import '../repository/database_handler.dart';
 
 import '../service/file_service.dart';
 
 class BooksListProvider extends ChangeNotifier {
   List<BookListItem> _items = [];
+  //DatabaseHandlerCalnotes dbCalnotes = DatabaseHandlerCalnotes();
   DatabaseHandler databaseHandler = DatabaseHandler();
+
   FileService fileService = FileService();
 
   List<BookListItem> get items {
@@ -19,6 +23,8 @@ class BooksListProvider extends ChangeNotifier {
   }
 
   Future<void> selectAll() async {
+    //await dbCalnotes.initDB();
+
     _items = await databaseHandler.getBookListItemList();
     notifyListeners();
   }
@@ -29,7 +35,7 @@ class BooksListProvider extends ChangeNotifier {
     //  name: newBookListItem.authors, sort: newBookListItem.author_sort);
 
     List<int> authorsIds = [];
-//TODO Triggereket hozzáadni
+
     for (String author in authorsList) {
       List<int> checkAuthors = (await databaseHandler.selectIdsByField(
           table: 'authors',
@@ -39,9 +45,10 @@ class BooksListProvider extends ChangeNotifier {
       bool authorNotExist = checkAuthors.isEmpty;
       if (authorNotExist) {
         int authorId = await databaseHandler.insert(
-          table: 'authors',
-          item: Authors(name: author.trim(), sort: 'sort'),
-        );
+            dropTrigger: DropTriggers.fkc_delete_on_authors_drop.name,
+            table: 'authors',
+            item: Authors(name: author.trim(), sort: 'sort'),
+            createTrigger: Triggers.fkc_delete_on_authors.name);
         authorsIds.add(authorId);
       } else {
         authorsIds = [...authorsIds, ...checkAuthors];
@@ -75,10 +82,10 @@ class BooksListProvider extends ChangeNotifier {
         extension: newBookListItem.formats);
 
     int bookId = await databaseHandler.insert(
-      dropTrigger: 'dropTriggerInsertBook',
+      dropTrigger: DropTriggers.books_insert_trg_drop.name,
       table: 'books',
       item: newBook,
-      createTrigger: 'createTriggerInsertBook',
+      createTrigger: Triggers.books_insert_trg.name,
     );
     await databaseHandler.insert(
       table: 'data',
@@ -116,13 +123,11 @@ class BooksListProvider extends ChangeNotifier {
   }) async {
     var databaseHandler = DatabaseHandler();
     databaseHandler.update(
-        dropTrigger: 'DROP TRIGGER "main"."books_update_trg"',
+        dropTrigger: DropTriggers.books_insert_trg_drop.name,
         table: 'books',
         id: id,
         item: book,
-        createTrigger: '''CREATE TRIGGER books_update_trg AFTER UPDATE ON books 
-            BEGIN UPDATE books SET sort=title_sort(NEW.title) 
-            WHERE id=NEW.id AND OLD.title NEW.title; END''');
+        createTrigger: Triggers.books_update_trg.name);
 
     Authors? checkAuthor = await databaseHandler.selectItemByLink(
         table: 'authors',

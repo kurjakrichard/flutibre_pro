@@ -1,6 +1,6 @@
 import 'package:flutibre/firstrun_wizard/wizard.dart';
 import 'package:flutibre/screens/editscreen.dart';
-import 'package:flutibre/widgets/theme.dart';
+import 'package:flutibre/constants/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/booklist_provider.dart';
@@ -29,8 +29,8 @@ class Flutibre extends StatelessWidget {
         theme: baseTheme,
         initialRoute: '/',
         routes: {
-          //'/': (context) => const SplashScreen(),
-          '/': (context) => FirstRunWizard.provider(),
+          '/': (context) => const SplashScreen(),
+          //'/': (context) => FirstRunWizard.provider(),
           '/homescreen': (context) => const HomeScreen(),
           '/addpage': (context) => const EditScreen(
                 title: 'Add Item',

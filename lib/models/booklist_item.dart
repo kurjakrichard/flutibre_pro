@@ -51,7 +51,7 @@ class BookListItem extends Equatable {
     this.has_cover = 0,
   });
   //Convert a Map object to a model object
-  BookListItem.fromMap(Map<String, dynamic> res)
+  BookListItem.fromJson(Map<String, dynamic> res)
       : id = res['id'],
         title = res['title'],
         authors = res['authors'] ?? '',

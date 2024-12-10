@@ -1,8 +1,8 @@
 // ignore_for_file: must_be_immutable, non_constant_identifier_names
 import 'package:equatable/equatable.dart';
-import 'database_model.dart';
+import 'books_model.dart';
 
-class BooksLanguagesLink extends Equatable implements DatabaseModel {
+class BooksLanguagesLink extends Equatable implements BooksModel {
   @override
   int? id;
   final int book;
@@ -17,7 +17,7 @@ class BooksLanguagesLink extends Equatable implements DatabaseModel {
 
   //Convert a Map object to a model opject
   @override
-  BooksLanguagesLink.fromMap(Map<String, dynamic> res)
+  BooksLanguagesLink.fromJson(Map<String, dynamic> res)
       : id = res['id'],
         book = res['book'],
         lang_code = res['lang_code'],
@@ -25,7 +25,7 @@ class BooksLanguagesLink extends Equatable implements DatabaseModel {
 
   //Convert a model object to a Map opject
   @override
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     Map<String, dynamic> map = <String, dynamic>{};
     if (id != null) {
       map['id'] = id;

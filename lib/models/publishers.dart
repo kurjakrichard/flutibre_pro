@@ -1,19 +1,19 @@
 // ignore_for_file: must_be_immutable
 import 'package:equatable/equatable.dart';
-import 'database_model.dart';
+import 'books_model.dart';
 
-class Series extends Equatable implements DatabaseModel {
+class Publishers extends Equatable implements BooksModel {
   @override
   int? id;
   final String name;
   final String sort;
   final String link;
 
-  Series({this.id, this.name = '', this.sort = '', this.link = ''});
+  Publishers({this.id, this.name = '', this.sort = '', this.link = ''});
 
   //Convert a Map object to a model object
   @override
-  Series.fromMap(Map<String, dynamic> res)
+  Publishers.fromJson(Map<String, dynamic> res)
       : id = res['id'],
         name = res['name'],
         sort = res['sort'],
@@ -21,7 +21,7 @@ class Series extends Equatable implements DatabaseModel {
 
   //Convert a model object to a Map object
   @override
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     Map<String, dynamic> map = <String, dynamic>{};
     if (id != null) {
       map['id'] = id;
@@ -34,7 +34,7 @@ class Series extends Equatable implements DatabaseModel {
 
   @override
   String toString() {
-    return 'Series(id : $id, name : $name, sort : $sort, link : $link)';
+    return 'Publishers(id : $id, name : $name, sort : $sort, link : $link)';
   }
 
   @override

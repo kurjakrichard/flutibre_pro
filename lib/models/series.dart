@@ -1,17 +1,19 @@
-import 'package:flutibre/model/database_model.dart';
+// ignore_for_file: must_be_immutable
+import 'package:equatable/equatable.dart';
+import 'books_model.dart';
 
-class Authors implements DatabaseModel {
+class Series extends Equatable implements BooksModel {
   @override
   int? id;
   final String name;
-  String? sort;
+  final String sort;
   final String link;
 
-  Authors({this.id, required this.name, required this.sort, this.link = ''});
+  Series({this.id, this.name = '', this.sort = '', this.link = ''});
 
   //Convert a Map object to a model object
   @override
-  Authors.fromMap(Map<String, dynamic> res)
+  Series.fromJson(Map<String, dynamic> res)
       : id = res['id'],
         name = res['name'],
         sort = res['sort'],
@@ -19,7 +21,7 @@ class Authors implements DatabaseModel {
 
   //Convert a model object to a Map object
   @override
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     Map<String, dynamic> map = <String, dynamic>{};
     if (id != null) {
       map['id'] = id;
@@ -32,6 +34,9 @@ class Authors implements DatabaseModel {
 
   @override
   String toString() {
-    return 'Authors(id : $id, name : $name, sort : $sort, link : $link)';
+    return 'Series(id : $id, name : $name, sort : $sort, link : $link)';
   }
+
+  @override
+  List<Object?> get props => [name, sort, link];
 }
